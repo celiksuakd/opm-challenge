@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CP2 CHALLENGE — Plants & Operations</title>
+<style>
+  :root {
+    --bg: #07090f;
+    --bg2: #0e1320;
+    --card: #131a2c;
+    --card2: #1a2340;
+    --text: #e6f1ff;
+    --muted: #6b7a99;
+    --accent: #00ff9f;
+    --accent2: #00d9ff;
+    --danger: #ff3860;
+    --warn: #ffb800;
+    --locked: #2a3147;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0,255,159,0.02) 0px,
+      rgba(0,255,159,0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index: 9999;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+    z-index: 9998;
+  }
+  #app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HUD */
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 20px rgba(0,255,159,0.15);
+    margin-bottom: 20px;
+    border-radius: 6px;
+  }
+  .hud-item { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+  .hud-label { color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-size: 11px; }
+  .hud-value { color: var(--accent); font-weight: bold; font-size: 18px; }
+  .lives { display: flex; gap: 4px; }
+  .life { width: 18px; height: 18px; color: var(--danger); font-size: 18px; line-height: 1; }
+  .life.lost { color: var(--locked); }
+  .streak.hot .hud-value { color: var(--warn); text-shadow: 0 0 10px var(--warn); }
+  .streak.fire .hud-value { color: var(--danger); text-shadow: 0 0 14px var(--danger); animation: pulse 0.6s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-3px, 2px); }
+    40% { transform: translate(3px, -2px); }
+    60% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+    100% { transform: translate(0); }
+  }
+
+  /* TITLE SCREEN */
+  .title-screen { text-align: center; padding-top: 80px; }
+  .title {
+    font-size: 64px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-shadow: 0 0 24px var(--accent), 0 0 60px rgba(0,255,159,0.3);
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    color: var(--accent2);
+    letter-spacing: 6px;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .tagline {
+    color: var(--muted);
+    margin-bottom: 60px;
+    font-size: 15px;
+  }
+  .boot-log {
+    text-align: left;
+    max-width: 500px;
+    margin: 30px auto;
+    background: var(--bg2);
+    border: 1px solid var(--locked);
+    padding: 16px;
+    font-size: 12px;
+    color: var(--muted);
+    min-height: 140px;
+  }
+  .boot-log .line { margin: 2px 0; }
+  .boot-log .ok { color: var(--accent); }
+  .boot-log .warn { color: var(--warn); }
+
+  .btn {
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    padding: 14px 32px;
+    font-family: inherit;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    margin: 6px;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 24px var(--accent);
+  }
+  .btn.secondary { border-color: var(--muted); color: var(--muted); }
+  .btn.secondary:hover { background: var(--muted); color: var(--bg); box-shadow: none; }
+  .btn.danger { border-color: var(--danger); color: var(--danger); }
+  .btn.danger:hover { background: var(--danger); color: var(--bg); box-shadow: 0 0 24px var(--danger); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* MAP */
+  .map-header { text-align: center; margin-bottom: 24px; }
+  .map-title { font-size: 28px; color: var(--accent); letter-spacing: 3px; }
+  .map-sub { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .room-card {
+    background: var(--card);
+    border: 1px solid var(--locked);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .room-card.unlocked {
+    border-color: var(--accent2);
+    box-shadow: 0 0 12px rgba(0,217,255,0.2);
+  }
+  .room-card.unlocked:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: 0 0 24px rgba(0,255,159,0.4);
+  }
+  .room-card.completed {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--card) 0%, rgba(0,255,159,0.06) 100%);
+  }
+  .room-card.locked { opacity: 0.4; cursor: not-allowed; }
+  .room-card.boss {
+    grid-column: span 2;
+    background: linear-gradient(135deg, var(--card2) 0%, rgba(255,56,96,0.08) 100%);
+    border-color: var(--danger);
+  }
+  .room-card.boss.locked { border-color: var(--locked); }
+  .room-id {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .room-name { font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--text); }
+  .room-date { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .room-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+  .stars { color: var(--warn); letter-spacing: 2px; font-size: 14px; }
+  .mastery { font-size: 11px; color: var(--accent); }
+  .lock-icon { color: var(--muted); }
+
+  /* ROOM (in-game) */
+  .question-screen { padding: 0; }
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--locked);
+  }
+  .breadcrumb { color: var(--muted); font-size: 12px; letter-spacing: 2px; }
+  .breadcrumb .accent { color: var(--accent); }
+  .q-progress { color: var(--accent2); font-size: 13px; }
+
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--accent2);
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 30px rgba(0,217,255,0.1);
+  }
+  .q-type-badge {
+    display: inline-block;
+    background: var(--bg2);
+    color: var(--accent2);
+    padding: 4px 10px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    border: 1px solid var(--accent2);
+  }
+  .q-prompt {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+  .q-prompt code, .q-prompt .eq {
+    font-family: ui-monospace, monospace;
+    background: var(--bg2);
+    padding: 1px 6px;
+    color: var(--accent);
+    border-radius: 3px;
+  }
+
+  /* MCQ options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    background: var(--bg2);
+    border: 1px solid var(--locked);
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .option:hover { border-color: var(--accent2); background: var(--card2); }
+  .option.selected { border-color: var(--accent); background: rgba(0,255,159,0.08); }
+  .option.correct { border-color: var(--accent); background: rgba(0,255,159,0.18); box-shadow: 0 0 16px rgba(0,255,159,0.3); }
+  .option.wrong { border-color: var(--danger); background: rgba(255,56,96,0.15); animation: glitch 0.3s; }
+  .option-letter {
+    display: inline-block;
+    width: 28px; height: 28px;
+    border: 1px solid var(--muted);
+    text-align: center;
+    line-height: 26px;
+    font-weight: bold;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .option.selected .option-letter, .option.correct .option-letter { border-color: var(--accent); color: var(--accent); }
+  .option.wrong .option-letter { border-color: var(--danger); color: var(--danger); }
+
+  /* Numeric input */
+  .numeric-wrap { display: flex; gap: 12px; align-items: center; }
+  .numeric-input {
+    background: var(--bg2);
+    border: 1px solid var(--accent2);
+    color: var(--accent);
+    padding: 14px 18px;
+    font-family: inherit;
+    font-size: 24px;
+    width: 200px;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  .numeric-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .numeric-units { color: var(--muted); font-size: 14px; }
+
+  /* Match */
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .match-col-label {
+    color: var(--accent2);
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .match-item {
+    background: var(--bg2);
+    border: 1px solid var(--locked);
+    padding: 12px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: all 0.15s;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 14px;
+  }
+  .match-item:hover { border-color: var(--accent2); }
+  .match-item.selected { border-color: var(--accent); background: rgba(0,255,159,0.1); }
+  .match-item.paired { opacity: 0.5; cursor: default; border-color: var(--accent); background: rgba(0,255,159,0.05); }
+  .match-pair-tag { display: inline-block; color: var(--accent); margin-right: 6px; font-weight: bold; }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 20px;
+    padding: 16px;
+    border-left: 3px solid;
+    background: var(--bg2);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.correct { border-color: var(--accent); }
+  .feedback.wrong { border-color: var(--danger); }
+  .feedback-title { font-weight: bold; margin-bottom: 6px; font-family: inherit; letter-spacing: 2px; }
+  .feedback.correct .feedback-title { color: var(--accent); }
+  .feedback.wrong .feedback-title { color: var(--danger); }
+  .feedback-explain { color: var(--muted); }
+
+  .q-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+
+  /* Results */
+  .result-screen { text-align: center; padding: 40px 0; }
+  .result-headline { font-size: 32px; color: var(--accent); letter-spacing: 4px; margin-bottom: 12px; }
+  .result-headline.fail { color: var(--danger); }
+  .result-room { color: var(--muted); margin-bottom: 32px; }
+  .result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+  .result-stat { }
+  .result-stat-value { font-size: 36px; color: var(--accent); font-weight: bold; }
+  .result-stat-label { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-top: 4px; }
+  .result-stars { font-size: 48px; color: var(--warn); letter-spacing: 8px; margin: 20px 0; }
+
+  /* Boss screen accent */
+  .boss-mode .question-card { border-color: var(--danger); box-shadow: 0 0 24px rgba(255,56,96,0.2); }
+  .boss-mode .q-type-badge { border-color: var(--danger); color: var(--danger); }
+  .boss-timer { color: var(--danger); font-size: 24px; font-weight: bold; letter-spacing: 2px; }
+  .boss-timer.critical { animation: flicker 0.4s infinite; }
+
+  /* Misc */
+  .center { text-align: center; }
+  .mt-lg { margin-top: 32px; }
+  .ascii { font-family: monospace; white-space: pre; line-height: 1.1; color: var(--accent); opacity: 0.5; font-size: 11px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ============================================================
+// QUESTION BANK — DCoCP (Dynamics and Control of Chemical Processes)
+// Course: Prof. Matteo Pelucchi, Politecnico di Milano, AY 2025/26
+// Based on Stephanopoulos "Chemical Process Control" + course calendar
+// ============================================================
+
+const ROOMS = [
+  {
+    id: 'L4', date: 'WK1', name: 'Heat Exchangers', questions: [
+      { type: 'mcq', prompt: 'LMTD in heat exchanger design stands for:',
+        options: ['Linear Mean Temperature Difference', 'Log Mean Temperature Difference', 'Local Maximum Temperature Difference', 'Limit of Mean Temperature Decay'],
+        correct: 1, explain: 'LMTD = ΔT_lm = (ΔT₁ − ΔT₂)/ln(ΔT₁/ΔT₂). The driving force for the design equation Q = U·A·LMTD·F. F = correction factor for non-pure counter/co-current.' },
+      { type: 'mcq', prompt: 'In a shell-and-tube exchanger, a corrosive or fouling fluid is preferentially placed on the:',
+        options: ['Shell side (more volume, less sensitive)', 'Tube side — tubes are easier to clean, replace, and resist higher pressure', 'Either, no preference', 'Whichever is hotter'],
+        correct: 1, explain: 'Tubes can be brushed/replaced individually; the shell is single-walled. Tube-side also handles higher P. Cooling water (fouling): tube-side. High-P steam: tube-side.' },
+      { type: 'numeric', prompt: 'Heat exchanger: U = 400 W/m²·K, A = 25 m², LMTD = 40 K (pure counter-current, F = 1). Heat duty Q? (kW)',
+        answer: 400, tolerance: 5, units: 'kW',
+        explain: 'Q = U·A·LMTD = 400·25·40 = 400,000 W = 400 kW. Memorize this equation — it appears on every HE problem.' },
+      { type: 'match', prompt: 'Match each exchanger type to its typical strength.',
+        pairs: [
+          { left: 'Shell-and-tube', right: 'Workhorse: wide T/P range, moderate cost' },
+          { left: 'Plate-and-frame', right: 'Compact, high U, low ΔT — great for clean fluids and food/dairy' },
+          { left: 'Double-pipe', right: 'Small duty, high pressure, easy to clean' },
+          { left: 'Air-cooled (fin-fan)', right: 'No cooling water needed; large footprint' }
+        ], explain: 'Choose the geometry from duty, fluids, pressure, fouling, footprint. Shell-and-tube wins by default; everything else for a specific reason.' },
+      { type: 'error', prompt: 'One statement is FALSE.',
+        statements: [
+          'Counter-current flow gives a higher LMTD than co-current for the same terminal temperatures',
+          'Increasing fluid velocity improves film coefficient at the cost of pressure drop',
+          'Fouling resistance reduces the effective overall U',
+          'A 1-shell, 2-tube-pass exchanger achieves true counter-current LMTD'
+        ], wrongIndex: 3, explain: 'Multiple tube passes introduce co-current legs → need a correction factor F<1. True counter-current LMTD only with 1-1 configuration or a plate exchanger.' }
+    ]
+  },
+  {
+    id: 'L5', date: 'WK2', name: 'Solar Thermal', questions: [
+      { type: 'mcq', prompt: 'Concentrating Solar Power (CSP) types include all EXCEPT:',
+        options: ['Parabolic trough', 'Solar tower (central receiver)', 'Linear Fresnel reflector', 'Photovoltaic panel (PV)'],
+        correct: 3, explain: 'PV converts photons directly to electricity (no thermal cycle). CSP collects solar heat for a Rankine cycle. The four CSP types: parabolic trough, tower, dish/Stirling, linear Fresnel.' },
+      { type: 'mcq', prompt: 'In a parabolic-trough plant, the HEAT TRANSFER FLUID circulated through the receiver is typically:',
+        options: ['Liquid water', 'Synthetic thermal oil (up to ~400°C) or molten salt (up to ~565°C)', 'Air', 'Liquid sodium'],
+        correct: 1, explain: 'Therminol/Dowtherm at lower T; nitrate-salt mixtures (Solar Salt, 60% NaNO3 + 40% KNO3) for high T and thermal storage. Water is restricted to direct steam generation designs.' },
+      { type: 'mcq', prompt: 'CONCENTRATION RATIO of a CSP collector is defined as:',
+        options: ['Receiver power / collector power', 'Aperture area / receiver area', 'Sun angle / collector angle', 'Mirror reflectivity'],
+        correct: 1, explain: 'C = A_aperture / A_receiver. Trough: ~30-80. Tower / dish: 500-3000+. Higher C → higher achievable T but smaller receiver / harder optics.' },
+      { type: 'mcq', prompt: 'The main reason MOLTEN SALT is preferred for THERMAL STORAGE in CSP plants:',
+        options: ['It is cheaper than water', 'Stable at high T, high heat capacity per unit volume, enables 6-15 h dispatchable power', 'Self-heating from radioactivity', 'It is non-toxic'],
+        correct: 1, explain: 'Two-tank salt storage decouples solar input from electricity output → CSP becomes dispatchable, competing with gas turbines for evening peaks. Game-changer for CSP economics.' },
+      { type: 'match', prompt: 'Match each CSP technology to its operating temperature regime.',
+        pairs: [
+          { left: 'Parabolic trough (oil)', right: '~300–400°C' },
+          { left: 'Parabolic trough (molten salt)', right: '~500–565°C' },
+          { left: 'Solar tower', right: '~565–700°C+' },
+          { left: 'Flat plate (solar thermal hot water)', right: '<100°C' }
+        ], explain: 'Operating T = function of concentration ratio and HTF. Higher T → higher Carnot efficiency, but costlier materials. Sweet spot has shifted from troughs to towers.' }
+    ]
+  },
+  {
+    id: 'L6', date: 'WK3', name: 'Pinch Technology', questions: [
+      { type: 'mcq', prompt: 'Pinch Technology is best described as:',
+        options: ['A method for sizing distillation columns', 'A systematic method for energy-targeting and heat-integration of process streams', 'A control-loop tuning method', 'A way to reduce reactor volume'],
+        correct: 1, explain: 'Linnhoff & Hindmarsh, late 1970s. Targets MINIMUM hot/cold utilities before designing any HX network. Drives plant energy bills down 20–40% on average.' },
+      { type: 'mcq', prompt: 'ΔT_min (minimum approach temperature) in pinch analysis represents:',
+        options: ['The lowest stream temperature in the plant', 'The smallest allowed approach between hot and cold streams in any single exchanger', 'The difference between hottest and coldest streams', 'A control offset'],
+        correct: 1, explain: 'ΔT_min is a degree-of-freedom: smaller → less utility but more area (capital). Typical 10–20°C for refining, 5–10°C for compact plate exchangers.' },
+      { type: 'mcq', prompt: 'The "PINCH POINT" on a composite-curve diagram is:',
+        options: ['Where streams cross', 'The location where the temperature gap between hot and cold composite curves equals ΔT_min', 'The hottest utility', 'Where the most heat is exchanged'],
+        correct: 1, explain: 'The pinch divides the system into a HEAT SINK (above pinch, needs hot utility) and a HEAT SOURCE (below pinch, needs cold utility). It is the bottleneck of integration.' },
+      { type: 'mcq', prompt: 'The three "golden rules" of pinch design are: (1) no heat across the pinch, (2) no cold utility above the pinch, (3) no hot utility below the pinch. Violating any of them:',
+        options: ['Saves utility', 'Wastes 1 kW of hot AND 1 kW of cold utility per kW transferred across the pinch', 'Is required by safety codes', 'Has no thermodynamic consequence'],
+        correct: 1, explain: 'Cross-pinch heat transfer is a DOUBLE penalty: you pay for the heat in (above pinch) AND the heat dumped (below pinch). The pinch is the energy bookkeeping boundary.' },
+      { type: 'numeric', prompt: 'A simple integration problem yields a required hot utility of 1500 kW. After applying pinch design (ΔT_min = 10°C), the new minimum hot utility (MER) is 600 kW. Energy savings as a percentage? (%)',
+        answer: 60, tolerance: 0.5, units: '%',
+        explain: '(1500 − 600)/1500 = 60% reduction. Real-plant savings of 20-40% are typical; 60% is at the upper bound of what pinch can target.' }
+    ]
+  },
+  {
+    id: 'L7', date: 'WK4', name: 'Heat Pumps', questions: [
+      { type: 'mcq', prompt: 'The COP (Coefficient of Performance) of a heating heat pump is defined as:',
+        options: ['Q_cold / W_in', 'Q_hot delivered / W_in (work input)', 'Q_hot / Q_cold', 'W_in / Q_hot'],
+        correct: 1, explain: 'Heating COP_h = Q_h / W. Carnot ceiling: COP_carnot = T_h / (T_h − T_c). Real units: 3-5 typical for residential, lower for high-T process applications.' },
+      { type: 'mcq', prompt: 'Mechanical Vapor Recompression (MVR) is most attractive when:',
+        options: ['Distillation column ΔT between top and bottom is large', 'Distillation column ΔT is small (close-boiling), so the compressor can boost overhead vapor to reboil bottoms', 'There is no condenser duty', 'Steam is free'],
+        correct: 1, explain: 'MVR: compress the overhead vapor enough to use it as the reboiler heat source. Pays off when ΔT_col is small (low compressor work needed). Common in salt evaporators, brewing, some distillations.' },
+      { type: 'mcq', prompt: 'In the classic vapor-compression cycle, the four components in order are:',
+        options: ['Evaporator → Compressor → Condenser → Expansion valve', 'Compressor → Evaporator → Condenser → Pump', 'Condenser → Evaporator → Compressor → Heater', 'Pump → Evaporator → Turbine → Condenser'],
+        correct: 0, explain: 'Refrigerant: low-P vapor → compressor (raise P, T) → condenser (reject Q_h) → expansion valve (drop P, T) → evaporator (absorb Q_c). Same cycle as your fridge, scaled up.' },
+      { type: 'numeric', prompt: 'A heat pump delivers Q_h = 12 kW of heat to a process while consuming W = 3 kW of electric power. COP_h?',
+        answer: 4, tolerance: 0.1, units: '',
+        explain: 'COP_h = Q_h / W = 12 / 3 = 4. Meaning: for every 1 kWh of electricity, 4 kWh of heat are delivered. The other 3 kWh come from the cold source.' },
+      { type: 'error', prompt: 'One statement is FALSE.',
+        statements: [
+          'A heat pump always satisfies COP_h = COP_c + 1',
+          'Higher temperature lift (T_h − T_c) reduces COP',
+          'Refrigerant choice is constrained by safety, environment (GWP, ODP) and operating range',
+          'A heat pump can have COP > 1 with no thermodynamic violation'
+        ], wrongIndex: 0, explain: 'COP_h = COP_c + 1 is the IDEAL Carnot relation. For real cycles with irreversibilities the equality breaks (COP_h ≈ COP_c + 1 only approximately). The other three statements are exact.' }
+    ]
+  },
+  {
+    id: 'L8', date: 'WK5', name: 'Cooling Towers', questions: [
+      { type: 'mcq', prompt: 'The COOLING TOWER "RANGE" is defined as:',
+        options: ['T_hot_water_in − T_cold_water_out', 'T_cold_water_out − T_wet_bulb', 'T_dry_bulb − T_wet_bulb', 'T_hot_water_in − T_dry_bulb'],
+        correct: 0, explain: 'Range = how much the cooling water is cooled (in - out). Typical 8-12°C. Set by the process duty, not the tower itself.' },
+      { type: 'mcq', prompt: 'The cooling tower "APPROACH" is defined as:',
+        options: ['T_cold_water_out − T_wet_bulb', 'T_hot_water_in − T_cold_water_out', 'T_dry_bulb − T_wet_bulb', 'T_hot − T_dry_bulb'],
+        correct: 0, explain: 'Approach = how close the outlet water gets to the air WET-BULB temperature (the thermodynamic minimum). Typical 3–8°C. Smaller approach → bigger/more expensive tower.' },
+      { type: 'mcq', prompt: 'COUNTER-FLOW vs CROSS-FLOW cooling towers:',
+        options: ['Counter-flow is always smaller for the same duty', 'Counter-flow gives the best thermal performance but slightly larger pumping head', 'Cross-flow uses less air', 'They are identical'],
+        correct: 1, explain: 'Counter-flow: best driving force, smaller footprint, but water-pump head higher. Cross-flow: cheaper distribution, lower head, taller structure. Most large process plants use counter-flow.' },
+      { type: 'mcq', prompt: 'Cooling-tower water-balance terms include EVAPORATION, DRIFT (entrained droplets), BLOWDOWN (purge to prevent salt build-up), and:',
+        options: ['Adsorption', 'Make-up water (added to compensate the losses)', 'Crystallization', 'Distillation'],
+        correct: 1, explain: 'Make-up replaces E + D + B. Cycles of concentration = make-up/blowdown. Higher CoC → less make-up but harsher water chemistry → more scaling/biocide cost.' },
+      { type: 'numeric', prompt: 'A cooling tower cools water from 40°C to 30°C; the design wet-bulb T_wb = 26°C. Compute the APPROACH. (°C)',
+        answer: 4, tolerance: 0.1, units: '°C',
+        explain: 'Approach = T_out − T_wb = 30 − 26 = 4°C. A 4°C approach is tight (expensive); plants often relax to 6-8°C to reduce tower size.' }
+    ]
+  },
+  {
+    id: 'L9', date: 'WK6', name: 'Evaporators', questions: [
+      { type: 'mcq', prompt: 'A MULTI-EFFECT evaporator uses the vapor produced in one effect as the heat source for the next. To make this thermodynamically possible:',
+        options: ['Each effect operates at the same pressure', 'Each successive effect operates at LOWER pressure (and hence lower boiling T)', 'Each effect operates at higher pressure', 'Heat is provided externally to each effect'],
+        correct: 1, explain: 'Lower P → lower T_sat → the vapor from effect 1 can boil the liquid in effect 2. Triple-effect evaporators triple the "economy" (kg evaporated / kg steam) versus single-effect.' },
+      { type: 'mcq', prompt: 'The EVAPORATOR ECONOMY (or steam economy) is defined as:',
+        options: ['Total energy used / energy purchased', 'kg of vapor produced / kg of live steam consumed', 'Concentration ratio', 'Boiling-point elevation'],
+        correct: 1, explain: 'Economy ≈ N (number of effects) ideally; in practice slightly less due to BPE, heat losses, condensate flash. Single-effect: ~0.8-0.95; quadruple-effect: ~3-3.5.' },
+      { type: 'mcq', prompt: 'BOILING POINT ELEVATION (BPE) refers to:',
+        options: ['The pressure at which boiling occurs', 'The increase in boiling temperature of a solution relative to the pure solvent at the same P', 'The flash-vapor fraction', 'A pump shutoff condition'],
+        correct: 1, explain: 'Dissolved salt/sugar raises T_boil. Important for evaporator design — Dühring lines plot T_boil(solution) vs T_boil(pure solvent) at the same P. BPE eats away the available LMTD.' },
+      { type: 'mcq', prompt: 'FORWARD FEED vs BACKWARD FEED in multi-effect evaporation:',
+        options: ['Forward = feed enters last effect; Backward = feed enters first', 'Forward = feed and steam flow same direction (effect 1 → N); Backward = feed enters last effect (N), steam enters first', 'They are identical', 'Backward is always preferred'],
+        correct: 1, explain: 'Forward: simple, no pumping (gravity, P-driven); but most-concentrated product sees coldest effect → worst U. Backward: better U on the concentrated side, but needs pumps against P. Pick based on viscosity, fouling.' },
+      { type: 'numeric', prompt: 'A triple-effect evaporator consumes 3000 kg/h of live steam and produces 8400 kg/h of vapor total. Steam economy?',
+        answer: 2.8, tolerance: 0.1, units: '',
+        explain: 'Economy = 8400/3000 = 2.8. Close to the theoretical maximum of 3 for triple-effect. Real losses (BPE, sensible heating of feed) limit you to ~2.5-2.8.' }
+    ]
+  },
+  {
+    id: 'L10', date: 'WK7', name: 'Crystallization', questions: [
+      { type: 'mcq', prompt: 'The thermodynamic DRIVING FORCE for crystallization is:',
+        options: ['Temperature', 'Pressure', 'SUPERSATURATION (the gap between actual concentration and equilibrium solubility)', 'pH'],
+        correct: 2, explain: 'No supersaturation → no crystallization. Generated by cooling, evaporation, antisolvent addition, or reaction. Operating "metastable zone" (slightly supersat) → crystal growth without runaway nucleation.' },
+      { type: 'mcq', prompt: 'NUCLEATION vs GROWTH in crystallization:',
+        options: ['Same process at different scales', 'Nucleation = formation of new crystal nuclei (strong supersaturation dependence); Growth = enlargement of existing crystals', 'Growth precedes nucleation', 'Only growth matters for product quality'],
+        correct: 1, explain: 'Balance is the whole game. Too much nucleation → many tiny crystals (hard to filter/wash). Too little → few giant crystals (encapsulate mother liquor). Seeding controls the balance.' },
+      { type: 'mcq', prompt: 'The MSMPR (Mixed-Suspension Mixed-Product Removal) model assumes:',
+        options: ['Perfect mixing of liquid + crystals, classified-product withdrawal', 'Perfect mixing of liquid AND crystals, with product withdrawn proportional to suspension', 'Plug flow', 'Stationary crystals'],
+        correct: 1, explain: 'MSMPR = CSTR analogue for crystallizers. Crystal Size Distribution (CSD) is exponential (in number basis): n(L) = n₀·exp(−L/Gτ). Cornerstone of population balance modeling.' },
+      { type: 'mcq', prompt: 'Three modes of generating supersaturation:',
+        options: ['Cooling, evaporation, antisolvent (or reaction)', 'Heating, freezing, ultrasound', 'Light, magnetism, pH', 'Stirring, settling, filtering'],
+        correct: 0, explain: 'Cooling crystallization: works when solubility is strongly T-dependent. Evaporative: weak T-dependence (e.g., NaCl). Antisolvent/precipitation: add a solvent that drops solubility. Reactive: precipitate from reaction product.' },
+      { type: 'error', prompt: 'One statement is FALSE.',
+        statements: [
+          'CSD (Crystal Size Distribution) determines downstream filtration and drying performance',
+          'Seeding suppresses primary nucleation and gives a narrower CSD',
+          'Higher supersaturation always gives larger crystals',
+          'Population balance equations are the standard mathematical framework for sizing crystallizers'
+        ], wrongIndex: 2, explain: 'Backwards: HIGH supersaturation favors NUCLEATION → many SMALL crystals. Slow, controlled supersaturation favors growth → larger crystals.' }
+    ]
+  },
+  {
+    id: 'L11', date: 'WK8', name: 'Filtration', questions: [
+      { type: 'mcq', prompt: 'CAKE FILTRATION vs DEEP-BED FILTRATION:',
+        options: ['Same thing', 'Cake: particles form a layer on the medium and become the actual filter; Deep-bed: particles captured throughout the depth of a porous bed', 'Cake is always for liquids, deep-bed for gases', 'Cake uses higher pressure'],
+        correct: 1, explain: 'Cake: high solids loading, ~µm-mm particles, batch (filter press). Deep-bed: low solids, sub-µm particles, continuous (sand filter, cartridge). Two fundamentally different physics.' },
+      { type: 'mcq', prompt: 'DEAD-END vs CROSS-FLOW filtration:',
+        options: ['Identical', 'Dead-end: feed flow perpendicular to membrane, cake grows; Cross-flow: tangential feed sweeps cake off, steady state possible', 'Cross-flow is only for gas', 'Dead-end has higher throughput'],
+        correct: 1, explain: 'Membrane processes (UF, MF, NF, RO) usually run cross-flow → tangential shear keeps cake thin. Cartridge/sterile filters run dead-end → simple, replace when fouled.' },
+      { type: 'match', prompt: 'Match each filter type to its typical service.',
+        pairs: [
+          { left: 'Filter press (plate-and-frame)', right: 'Batch dewatering of concentrated slurries' },
+          { left: 'Rotary drum vacuum filter', right: 'Continuous filtration of moderate-solids slurry' },
+          { left: 'Belt filter', right: 'Continuous wash + dewatering, e.g., mineral processing' },
+          { left: 'Cartridge filter', right: 'Polishing of low-solids streams' }
+        ], explain: 'Match the equipment to (batch vs continuous), solids loading, washing needs, and product purity. Rotary drum is the workhorse of moderate-duty industrial filtration.' },
+      { type: 'mcq', prompt: 'FILTER AIDS (e.g., diatomaceous earth, perlite) are used to:',
+        options: ['Lower temperature', 'Form a porous pre-coat or be slurried with the feed to prevent membrane blinding and improve cake permeability', 'Reduce pressure drop in vessels', 'Heat the cake'],
+        correct: 1, explain: 'Compressible/sticky slurries blind the medium fast. Filter aid pre-coat creates a rigid porous layer that catches the fines while letting filtrate through. Common in food, juice, fermentation.' },
+      { type: 'numeric', prompt: 'For constant-pressure CAKE filtration, the integral form is t = α·V²/2 + β·V. If filtering 5 m³ takes 25 min, neglecting medium resistance (β→0), how long does 10 m³ take? (min)',
+        answer: 100, tolerance: 1, units: 'min',
+        explain: 't ∝ V². Double the volume → 4× the time. 25 min × 4 = 100 min. Foundational for batch filtration sizing.' }
+    ]
+  },
+  {
+    id: 'L12', date: 'WK9', name: 'Drying & Spray Drying', questions: [
+      { type: 'mcq', prompt: 'The CONSTANT-RATE drying period corresponds to:',
+        options: ['The crystallization stage', 'Free moisture evaporation from a wet surface — rate is set by air conditions, NOT by the solid', 'Bound moisture diffusing out of the solid', 'Final cool-down'],
+        correct: 1, explain: 'During constant-rate, the surface is wet; rate = h·A·(T_air − T_wb)/λ. Independent of moisture content. Ends at the CRITICAL MOISTURE CONTENT — surface starts drying.' },
+      { type: 'mcq', prompt: 'In the FALLING-RATE period of drying:',
+        options: ['Drying rate is constant', 'Drying rate decreases as moisture content decreases; diffusion within the solid becomes limiting', 'Drying stops completely', 'Material rehydrates'],
+        correct: 1, explain: 'Below critical moisture: water has to diffuse through the dry surface layer. Slow, drying time often >> constant-rate time. Equilibrium moisture content (EMC) sets the asymptote.' },
+      { type: 'mcq', prompt: 'In a SPRAY DRYER:',
+        options: ['Material is dried as a thin film on a heated surface', 'Liquid feed is atomized into fine droplets and contacted with hot drying air → product is collected as powder', 'A vacuum freezes the product', 'Microwaves heat the product'],
+        correct: 1, explain: 'Atomizer (rotary disc or nozzle) → drying chamber with hot air → cyclone + bag filter for fines. Milliseconds of residence → great for heat-sensitive (milk powder, pharma, instant coffee).' },
+      { type: 'match', prompt: 'Match each industrial dryer to its typical product.',
+        pairs: [
+          { left: 'Spray dryer', right: 'Heat-sensitive liquids → free-flowing powder (milk, instant coffee)' },
+          { left: 'Fluidized-bed dryer', right: 'Granular solids; gentle agitation, uniform T' },
+          { left: 'Rotary kiln dryer', right: 'Coarse solids in bulk (minerals, fertilizers)' },
+          { left: 'Tray (batch) dryer', right: 'Small batches, pilot, pharma' }
+        ], explain: 'Pick by feed form (liquid, slurry, paste, granule, sheet) and product sensitivity. Spray + fluid-bed are the two most "modern" industrial choices for fine powders.' },
+      { type: 'error', prompt: 'One statement is FALSE.',
+        statements: [
+          'Air temperature, humidity, and velocity all affect the constant-rate drying rate',
+          'Equilibrium moisture content depends on the solid and the air conditions',
+          'Lower air humidity always speeds the falling-rate period',
+          'During the constant-rate period the solid temperature is approximately the wet-bulb T'
+        ], wrongIndex: 2, explain: 'Falling rate is limited by internal diffusion / pore geometry. Air conditions matter only weakly. Lowering humidity helps the equilibrium endpoint but not the rate at higher moisture.' }
+    ]
+  },
+  {
+    id: 'L14', date: 'WK10', name: 'Lyophilization (Freeze Drying)', questions: [
+      { type: 'mcq', prompt: 'Lyophilization is the:',
+        options: ['Same as spray drying', 'Removal of water from a frozen product by SUBLIMATION under vacuum (below the triple point)', 'High-temperature drying', 'Microwave drying'],
+        correct: 1, explain: 'Freeze → low-P sublimation → secondary desorption. Preserves heat-sensitive structure: pharmaceuticals, vaccines, plasma, gourmet coffee. Premium price, premium quality.' },
+      { type: 'mcq', prompt: 'The three sequential stages of a lyophilization cycle are:',
+        options: ['Mixing → heating → cooling', 'Freezing → primary drying (sublimation) → secondary drying (desorption of bound water)', 'Granulation → sieving → drying', 'Atomization → evaporation → collection'],
+        correct: 1, explain: 'Freezing sets ice crystal structure → cake porosity. Primary drying: sublime ice (slow, energy-intensive). Secondary: remove bound water by warming under vacuum. Whole cycle: hours to days.' },
+      { type: 'mcq', prompt: 'PRIMARY DRYING in lyophilization operates at:',
+        options: ['Above the boiling point', 'Pressure BELOW the triple point of water (~611 Pa), shelf T just above the eutectic / glass transition', 'Atmospheric pressure', 'Above 100°C'],
+        correct: 1, explain: 'Pressure < triple-point → liquid water can\'t exist → ice goes directly to vapor. Operating just BELOW eutectic temperature ensures the cake stays solid (collapse = lost product).' },
+      { type: 'mcq', prompt: 'EUTECTIC TEMPERATURE (or glass-transition T_g\') is critical because:',
+        options: ['It is when freezing begins', 'It is the maximum allowed temperature during primary drying; above it the frozen matrix collapses and product is lost', 'It corresponds to bound water release', 'It marks complete drying'],
+        correct: 1, explain: 'Cake collapse = melt-back / loss of porosity / poor reconstitution. Operate 2–5°C below eutectic for safety. Formulation excipients (mannitol, sucrose) tune this temperature.' },
+      { type: 'error', prompt: 'One statement is FALSE.',
+        statements: [
+          'Lyophilization preserves heat-sensitive products with minimal damage',
+          'It is more expensive per kg of water removed than spray drying',
+          'Vials of pharmaceuticals are typically lyophilized in-situ on the shelf',
+          'Lyophilized products have higher moisture content than oven-dried products'
+        ], wrongIndex: 3, explain: 'Backwards. Lyo gives extremely LOW residual moisture (<1%) — that\'s a major reason vaccines are stable. Spray and oven dry to higher residual moisture in many cases.' }
+    ]
+  },
+  {
+    id: 'L15', date: 'WK11', name: 'PrOM · DCS & Big Data', questions: [
+      { type: 'mcq', prompt: 'DCS stands for:',
+        options: ['Direct Control Servers', 'Distributed Control System — controllers distributed across a plant, networked via redundant data highways', 'Digital Computing Set', 'Decentralized Sensor Cluster'],
+        correct: 1, explain: 'DCS = the brain of a modern plant. Controllers on the field, operator stations in the control room, redundant networks. Brands: Honeywell Experion, Emerson DeltaV, Yokogawa CENTUM, ABB 800xA.' },
+      { type: 'mcq', prompt: 'The classical automation pyramid (ISA-95) layers, bottom → top, are:',
+        options: ['ERP → MES → SCADA/DCS → Field instruments', 'Field (sensors, valves) → PLC/DCS (control) → SCADA → MES (manufacturing exec) → ERP (enterprise)', 'Cloud → DCS → ERP → Field', 'ERP → MES → ERP → MES'],
+        correct: 1, explain: 'Layer 0/1: field. Layer 2: control. Layer 3: MES (scheduling, batch records). Layer 4: ERP (finance, planning). IT/OT convergence is blurring these boundaries today.' },
+      { type: 'mcq', prompt: 'A PROCESS HISTORIAN (PI, Aspen IP.21, etc.) is:',
+        options: ['A safety-critical interlock system', 'A time-series database that archives plant tags (T, P, F, …) for years at high resolution', 'A maintenance log book', 'A control algorithm'],
+        correct: 1, explain: 'Historians enable analytics, troubleshooting, audit. Millions of tags, decades of history. The single most valuable IT asset for many plants — and the foundation of any "big data" project.' },
+      { type: 'mcq', prompt: 'A common BIG DATA / industrial analytics use case in a chemical plant is:',
+        options: ['Posting to social media', 'PREDICTIVE MAINTENANCE — using vibration / temperature trends + ML to flag pump failure days before it happens', 'Replacing the operator', 'Eliminating the DCS'],
+        correct: 1, explain: 'Other classic use cases: soft-sensors (predict slow lab measurements from fast process tags), anomaly detection, golden-batch comparison, energy benchmarking. ML augments — does not replace — DCS.' },
+      { type: 'error', prompt: 'One is FALSE.',
+        statements: [
+          'DCS is designed for high availability with redundant controllers and networks',
+          'SCADA is typically used for geographically distributed assets (pipelines, water networks)',
+          'OPC UA is a modern open standard for industrial data exchange',
+          'A historian writes data only when an operator manually triggers a save'
+        ], wrongIndex: 3, explain: 'Historians write continuously, with deadband / compression algorithms to keep storage manageable. Operators only annotate events.' }
+    ]
+  },
+  {
+    id: 'L17', date: 'WK12', name: 'PrOM · Digital Twins', questions: [
+      { type: 'mcq', prompt: 'A DIGITAL TWIN is best defined as:',
+        options: ['A CAD drawing', 'A live, model-based virtual replica of a physical asset/process, synchronized with real plant data', 'A backup of the DCS database', 'Any spreadsheet model'],
+        correct: 1, explain: 'Three ingredients: (1) physics or data-driven model, (2) live plant signals, (3) bidirectional value (predict, recommend, optimize). Without live data sync, it\'s just a model.' },
+      { type: 'mcq', prompt: 'The three classical levels of analytics maturity are:',
+        options: ['Descriptive → Predictive → Prescriptive', 'Reactive → Active → Passive', 'Linear → Quadratic → Cubic', 'Static → Dynamic → Stochastic'],
+        correct: 0, explain: 'Descriptive: what happened (dashboards). Predictive: what will happen (forecasts, soft sensors). Prescriptive: what to DO about it (advisory, closed-loop optimization).' },
+      { type: 'mcq', prompt: 'A typical USE CASE for a unit-operation digital twin:',
+        options: ['Replace the operator', 'Operator training (what-if), real-time optimization (setpoint advisory), predictive maintenance, debottlenecking studies', 'Replace the DCS', 'Backup the P&ID'],
+        correct: 1, explain: 'Twin pays back via faster decision-making, fewer surprises, captured plant-knowledge. Best ROI: training + RTO. Worst ROI: trying to replace control with twin "in the loop."' },
+      { type: 'mcq', prompt: 'DATA LAKE vs DATA WAREHOUSE:',
+        options: ['Identical', 'Lake stores raw multi-format data cheaply, schema-on-read; warehouse stores structured, modeled data, schema-on-write', 'Lake is for liquids, warehouse for solids', 'Warehouse is always cheaper'],
+        correct: 1, explain: 'Lake: cheap, flexible, supports ML pipelines. Warehouse: clean, queryable, supports BI. Modern stacks use both ("lakehouse"). Process plants increasingly stream historian data → cloud lake.' },
+      { type: 'error', prompt: 'One is FALSE.',
+        statements: [
+          'A purely data-driven model (no physics) cannot extrapolate safely beyond the training data',
+          'First-principles models (mass/energy balances) generalize better but are slower to build',
+          'Hybrid (physics + ML) models try to combine the strengths of both',
+          'A digital twin requires real-time bidirectional control of the plant'
+        ], wrongIndex: 3, explain: 'A twin needs LIVE DATA in, but does NOT need to write back to the DCS. Most twins are advisory (open loop). Closed-loop twin = RTO (real-time optimization) — a more demanding deployment.' }
+    ]
+  },
+  {
+    id: 'L20', date: 'WK13', name: 'PrOM · Supply Chain', questions: [
+      { type: 'mcq', prompt: 'The BULLWHIP EFFECT in supply chains refers to:',
+        options: ['Order amplification: small variations in downstream demand cause larger swings in upstream production/inventory', 'Whip-like motion of belt conveyors', 'A pneumatic transport phenomenon', 'A safety hazard'],
+        correct: 0, explain: 'Forrester effect. Caused by demand forecasting lags, batch ordering, price fluctuations, rationing. Mitigated by information sharing (vendor-managed inventory) and smaller / faster orders.' },
+      { type: 'mcq', prompt: 'S&OP (Sales & Operations Planning) is:',
+        options: ['A safety-instrumented function', 'A monthly business process aligning sales forecasts, production plans, inventory targets and finance', 'A specific software', 'A control loop'],
+        correct: 1, explain: 'Bridges marketing (demand) and operations (supply). Without S&OP, sales over-promises and production over- or under-builds. Mature S&OP is a strong predictor of EBITDA.' },
+      { type: 'mcq', prompt: 'JUST-IN-TIME (JIT) production minimizes:',
+        options: ['Capital cost only', 'Inventory at every step — produce what is needed, when it is needed', 'Energy use', 'Number of products'],
+        correct: 1, explain: 'Toyota production system. Demands tight supplier coordination, short setup times, level production. COVID-era stress-tested JIT for chemicals (just-in-CASE inventories are back in vogue).' },
+      { type: 'mcq', prompt: 'The role of ERP (e.g., SAP) in a process plant is to:',
+        options: ['Control the reactor', 'Integrate finance, procurement, inventory, sales, HR; the system of record for transactions', 'Replace the DCS', 'Tune PID loops'],
+        correct: 1, explain: 'ERP = Layer 4. Connects to MES (Layer 3) for production reporting, to suppliers for procurement, to customers for billing. Mis-aligned ERP and MES = bad data, bad decisions.' },
+      { type: 'error', prompt: 'One statement is FALSE.',
+        statements: [
+          'Scheduling in process plants must respect campaign sequences and changeover times',
+          'A higher safety stock decreases the risk of stockout but increases working capital',
+          'MTS (Make-to-Stock) is preferred for high-volume, low-variation commodities',
+          'MTO (Make-to-Order) eliminates the need for any production planning'
+        ], wrongIndex: 3, explain: 'MTO still needs careful capacity planning, raw-material lead times, and finite scheduling. MTO eliminates FINISHED inventory, not planning.' }
+    ]
+  },
+  {
+    id: 'L91', date: 'WK14', name: 'CO2 Utilization & Biorefineries', questions: [
+      { type: 'mcq', prompt: 'CCS vs CCU distinction:',
+        options: ['Same thing', 'CCS (Carbon Capture & STORAGE): permanently sequester CO2 underground. CCU (UTILIZATION): convert CO2 into chemicals, fuels, materials', 'CCU is illegal', 'CCS uses biology, CCU uses chemistry'],
+        correct: 1, explain: 'CCS = geological. CCU = product. CCS is needed at scale; CCU adds optionality (especially urea, methanol, mineralization, polymers). CCU alone cannot close the carbon balance.' },
+      { type: 'mcq', prompt: 'The MAIN challenge of using CO2 as a chemical feedstock is:',
+        options: ['CO2 is too rare', 'CO2 is the LOWEST-energy form of carbon; reducing it requires H2 (ideally green) and significant energy input', 'It freezes too easily', 'Safety regulations'],
+        correct: 1, explain: 'Thermodynamics dictates the cost. Cheap green H2 is the rate-limiting step for CO2-to-X. Same energy bottleneck as the broader hydrogen economy.' },
+      { type: 'mcq', prompt: 'Biorefinery generation classification:',
+        options: ['1G/2G/3G has no meaning', '1G = food crops (corn, sugar); 2G = lignocellulosic (straw, wood); 3G = algae and other non-conventional', '1G is the most modern', 'Generations refer to plant size'],
+        correct: 1, explain: '1G: easy chemistry, food-vs-fuel issues. 2G: harder (lignin is tough), no food competition. 3G: algae — high potential, scale and harvest economics still unresolved.' },
+      { type: 'mcq', prompt: 'Lignocellulose has THREE main biopolymer fractions:',
+        options: ['Starch, sugar, protein', 'Cellulose, hemicellulose, lignin', 'Cellulose, lipid, lignin', 'Glucose, fructose, sucrose'],
+        correct: 1, explain: 'Cellulose (β-1,4 glucose, crystalline, ~40%). Hemicellulose (mixed C5/C6 sugars, ~25%). Lignin (aromatic polymer, ~25%). Each needs its own conversion strategy.' },
+      { type: 'mcq', prompt: 'FAME vs HVO biodiesel:',
+        options: ['Identical', 'FAME = Fatty Acid Methyl Ester (transesterification, oxygenated); HVO = Hydrotreated Vegetable Oil (deoxygenation with H2, drop-in diesel)', 'HVO is the older technology', 'FAME has higher cetane'],
+        correct: 1, explain: 'FAME: simple, but bad cold flow, oxidative instability, max ~7% blend. HVO: chemically identical to fossil diesel, drop-in, expensive H2 needs — the modern premium biofuel.' }
+    ]
+  }
+];
+
+// Boss round: shuffled mix + a few exclusive integrative questions
+const BOSS_EXCLUSIVE = [
+  { type: 'mcq', prompt: 'A plant manager asks: "I want to cut my steam bill by 30% next year." What is the FIRST tool you reach for?',
+    options: ['Replace the DCS', 'Pinch analysis of the existing network — target the MER before designing any new HX', 'Install solar panels on the roof', 'Hire more operators'],
+    correct: 1, explain: 'Always TARGET before you DESIGN. Pinch tells you the thermodynamic minimum utility — anything you do should approach that target. Random heat-integration moves often underperform pinch.' },
+  { type: 'mcq', prompt: 'You are sizing a cooling tower for a tropical site with high wet-bulb (T_wb = 28°C). Your process requires cooling water at 30°C. The approach you must design for is:',
+    options: ['Very large (≈10°C, generous)', 'Very small (≈2°C) — likely uneconomic; consider air coolers or a different process', 'Negative', 'Set by dry-bulb only'],
+    correct: 1, explain: 'Approach = 30 − 28 = 2°C. A 2°C approach is brutal (huge tower, lots of fans). High T_wb sites usually combine air cooling + cooling tower or use chillers for the last few degrees.' },
+  { type: 'mcq', prompt: 'A pharma plant produces a heat-sensitive antibiotic. Which drying technique is the CORRECT choice?',
+    options: ['Direct-fired rotary kiln', 'Lyophilization (freeze drying) — preserves activity at the cost of cycle time and energy', 'Spray drying with inlet air at 350°C', 'Tray drying in atmospheric air at 150°C'],
+    correct: 1, explain: 'Antibiotics, vaccines, plasma — anything that denatures above ~40-60°C — go to lyo, period. Spray drying CAN work for some pharma but inlet T must be moderated and outlet T set carefully.' },
+  { type: 'numeric', prompt: 'A heat pump replaces an electric resistance heater. Resistance heater: COP = 1. Heat pump: COP_h = 4. If the heat demand is 100 kW continuous and electricity is €100/MWh, annual electricity savings? (€/year, assume 8000 h/year operation)',
+    answer: 60000, tolerance: 1000, units: '€/year',
+    explain: 'Resistance: 100 kW × 8000 h = 800 MWh × €100 = €80,000. Heat pump at COP 4: 100/4 = 25 kW × 8000 h = 200 MWh × €100 = €20,000. Savings = €60,000/year. Payback typically 3-7 yr.' },
+  { type: 'mcq', prompt: 'A digital twin of a distillation column is providing operator advisory setpoints. Suddenly it diverges from the real plant. The MOST LIKELY cause is:',
+    options: ['Operator error', 'Model-mismatch from an unmeasured feed composition change, instrument drift, or a missing fouling term', 'The twin has been hacked', 'The DCS is broken'],
+    correct: 1, explain: 'Twins drift. Causes: unmeasured disturbance, sensor drift, kinetic / thermal degradation, fouling, control changes. Twin must include continuous re-tuning (parameter estimation) to stay valid.' }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const SAVE_KEY = 'opm_challenge_v1';
+let state = loadState();
+
+function defaultState() {
+  return {
+    screen: 'title',
+    lives: 3,
+    score: 0,
+    streak: 0,
+    bestStreak: 0,
+    totalXp: 0,
+    currentRoomId: null,
+    currentQIdx: 0,
+    currentAnswer: null,
+    answered: false,
+    lastCorrect: null,
+    roomResults: [],  // per-question correct/wrong for current room
+    progress: {},     // { L1: { stars: 3, mastery: 100, completed: true }, ... }
+    bossUnlocked: false,
+    bossDone: false,
+    bossTimer: null,
+    bossStartTime: null,
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return defaultState();
+    const saved = JSON.parse(raw);
+    return { ...defaultState(), ...saved, screen: 'title' };  // always return to title on reload
+  } catch (e) {
+    return defaultState();
+  }
+}
+
+function save() {
+  try {
+    const persist = {
+      lives: state.lives, score: state.score, bestStreak: state.bestStreak,
+      totalXp: state.totalXp, progress: state.progress,
+      bossUnlocked: state.bossUnlocked, bossDone: state.bossDone,
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(persist));
+  } catch (e) {}
+}
+
+function resetAll() {
+  if (!confirm('Wipe all progress and start over? This cannot be undone.')) return;
+  localStorage.removeItem(SAVE_KEY);
+  state = defaultState();
+  render();
+}
+
+// ============================================================
+// AUDIO (Web Audio API beeps)
+// ============================================================
+let audioCtx = null;
+function beep(freq, dur, type = 'square', vol = 0.04) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+const sfx = {
+  click: () => beep(800, 0.05),
+  correct: () => { beep(660, 0.1); setTimeout(() => beep(990, 0.15), 80); },
+  wrong: () => { beep(180, 0.2, 'sawtooth', 0.06); },
+  unlock: () => { beep(440, 0.08); setTimeout(() => beep(660, 0.08), 70); setTimeout(() => beep(880, 0.15), 140); },
+  boss: () => { beep(110, 0.4, 'sawtooth', 0.08); }
+};
+
+// ============================================================
+// RENDER
+// ============================================================
+const app = document.getElementById('app');
+
+function render() {
+  switch (state.screen) {
+    case 'title': renderTitle(); break;
+    case 'map': renderMap(); break;
+    case 'room': renderRoom(); break;
+    case 'result': renderResult(); break;
+    case 'boss-intro': renderBossIntro(); break;
+    case 'boss-result': renderBossResult(); break;
+  }
+}
+
+function renderTitle() {
+  const completed = Object.values(state.progress).filter(p => p.completed).length;
+  const total = ROOMS.length;
+  const continueDisabled = completed === 0 && state.totalXp === 0;
+  app.innerHTML = `
+    <div class="title-screen">
+      <div class="subtitle">POLITECNICO · MILANO · MANENTI · Y2 SEM 2</div>
+      <div class="title">CP2</div>
+      <div class="subtitle">CHALLENGE · CHEMICAL PLANTS & PrOM</div>
+      <div class="tagline">14 rooms. Heat exchangers to digital twins. Pinch, dryers, DCS.</div>
+      <div class="boot-log" id="bootLog"></div>
+      <div class="mt-lg">
+        <button class="btn" onclick="goMap()">${continueDisabled ? 'INITIATE' : 'CONTINUE'}</button>
+        ${continueDisabled ? '' : '<button class="btn danger" onclick="resetAll()">RESET</button>'}
+      </div>
+    </div>
+  `;
+  typeBoot([
+    '> cp2.boot --target=plant_walkthrough',
+    '> loading unit ops map .......... <span class="ok">OK</span>',
+    `> rooms detected: <span class="ok">${total}</span> · cleared: <span class="ok">${completed}</span>`,
+    `> total XP: <span class="ok">${state.totalXp}</span> · best streak: <span class="warn">${state.bestStreak}</span>`,
+    '> reference: Manenti lectures + Di Pretoro/Manenti book',
+    '> DCS handshake <span class="ok">OK</span>. clear to operate.'
+  ]);
+}
+
+function typeBoot(lines) {
+  const el = document.getElementById('bootLog');
+  if (!el) return;
+  let i = 0;
+  function nextLine() {
+    if (i >= lines.length) return;
+    const d = document.createElement('div');
+    d.className = 'line';
+    d.innerHTML = lines[i];
+    el.appendChild(d);
+    i++;
+    setTimeout(nextLine, 180);
+  }
+  nextLine();
+}
+
+function renderHUD() {
+  const livesHtml = Array.from({ length: 3 }, (_, i) =>
+    `<span class="life ${i >= state.lives ? 'lost' : ''}">●</span>`
+  ).join('');
+  const streakClass = state.streak >= 8 ? 'fire' : state.streak >= 4 ? 'hot' : '';
+  return `
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">LIVES</span>
+        <div class="lives">${livesHtml}</div>
+      </div>
+      <div class="hud-item streak ${streakClass}">
+        <span class="hud-label">STREAK</span>
+        <span class="hud-value">×${state.streak}</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">XP</span>
+        <span class="hud-value">${state.totalXp}</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">BEST</span>
+        <span class="hud-value">${state.bestStreak}</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderMap() {
+  let html = renderHUD();
+  html += `
+    <div class="map-header">
+      <div class="map-title">// PLANT WALKTHROUGH MAP</div>
+      <div class="map-sub">Clear rooms in order. 4/5 correct unlocks the next room. 5/5 = 3 stars. Manenti CP2.</div>
+    </div>
+    <div class="room-grid">
+  `;
+  let prevCompleted = true;
+  for (let i = 0; i < ROOMS.length; i++) {
+    const r = ROOMS[i];
+    const p = state.progress[r.id] || { stars: 0, mastery: 0, completed: false };
+    const unlocked = prevCompleted || p.completed;
+    const cls = p.completed ? 'completed' : (unlocked ? 'unlocked' : 'locked');
+    const stars = p.stars > 0 ? '★'.repeat(p.stars) + '☆'.repeat(3 - p.stars) : '';
+    const mastery = p.completed ? `${p.mastery}%` : '';
+    html += `
+      <div class="room-card ${cls}" ${unlocked ? `onclick="startRoom('${r.id}')"` : ''}>
+        <div>
+          <div class="room-id">ROOM ${i + 1} · ${r.id}</div>
+          <div class="room-name">${r.name}</div>
+          <div class="room-date">${r.date}/2026</div>
+        </div>
+        <div class="room-footer">
+          ${unlocked ? `<span class="stars">${stars}</span><span class="mastery">${mastery}</span>` : '<span class="lock-icon">🔒 LOCKED</span>'}
+        </div>
+      </div>
+    `;
+    prevCompleted = p.completed;
+  }
+
+  // Boss
+  const allDone = ROOMS.every(r => state.progress[r.id]?.completed);
+  const bossCls = state.bossDone ? 'completed boss' : (allDone ? 'unlocked boss' : 'locked boss');
+  html += `
+    <div class="room-card ${bossCls}" ${allDone ? 'onclick="startBoss()"' : ''}>
+      <div>
+        <div class="room-id" style="color: var(--danger);">★ FINAL ROUND</div>
+        <div class="room-name">EXAM SIMULATION — Mixed Topics · No Hints · Timer</div>
+        <div class="room-date">All lectures · Stephanopoulos boss fight</div>
+      </div>
+      <div class="room-footer">
+        ${allDone ? (state.bossDone ? `<span class="stars">★★★</span><span style="color:var(--danger)">CLEARED</span>` : '<span style="color: var(--danger);">▶ ENTER</span>') : '<span class="lock-icon">🔒 CLEAR ALL ROOMS</span>'}
+      </div>
+    </div>
+  `;
+
+  html += '</div>';
+  app.innerHTML = html;
+}
+
+function renderRoom() {
+  const room = ROOMS.find(r => r.id === state.currentRoomId);
+  if (!room) { state.screen = 'map'; render(); return; }
+  const q = room.questions[state.currentQIdx];
+  let html = renderHUD();
+  html += `
+    <div class="question-header">
+      <div class="breadcrumb">// <span class="accent">${room.id}</span> · ${room.name}</div>
+      <div class="q-progress">Q ${state.currentQIdx + 1} / ${room.questions.length}</div>
+    </div>
+    <div class="question-card">
+      <div class="q-type-badge">${q.type.toUpperCase()}</div>
+      <div class="q-prompt">${q.prompt}</div>
+      ${renderQuestionBody(q)}
+      ${state.answered ? renderFeedback(q) : ''}
+      <div class="q-actions">
+        ${state.answered
+          ? `<button class="btn" onclick="nextQuestion()">${state.currentQIdx + 1 >= room.questions.length ? 'FINISH ROOM' : 'NEXT →'}</button>`
+          : `<button class="btn" id="submitBtn" onclick="submitAnswer()" ${state.currentAnswer === null ? 'disabled' : ''}>SUBMIT</button>`}
+        <button class="btn secondary" onclick="abandonRoom()">EXIT</button>
+      </div>
+    </div>
+  `;
+  app.innerHTML = html;
+}
+
+function renderQuestionBody(q) {
+  const locked = state.answered ? 'style="pointer-events: none;"' : '';
+  if (q.type === 'mcq' || q.type === 'error') {
+    const options = q.type === 'mcq' ? q.options : q.statements;
+    return `<div class="options" ${locked}>` + options.map((opt, i) => {
+      let cls = '';
+      if (state.currentAnswer === i) cls = 'selected';
+      if (state.answered) {
+        const correctIdx = q.type === 'mcq' ? q.correct : q.wrongIndex;
+        if (i === correctIdx) cls = 'correct';
+        else if (i === state.currentAnswer) cls = 'wrong';
+      }
+      const letter = String.fromCharCode(65 + i);
+      return `<div class="option ${cls}" onclick="pickOption(${i})"><span class="option-letter">${letter}</span><span>${opt}</span></div>`;
+    }).join('') + '</div>';
+  }
+  if (q.type === 'numeric') {
+    return `
+      <div class="numeric-wrap">
+        <input type="number" class="numeric-input" id="numInput" step="any"
+               value="${state.currentAnswer ?? ''}"
+               oninput="state.currentAnswer = this.value === '' ? null : parseFloat(this.value); document.getElementById('submitBtn').disabled = state.currentAnswer === null;"
+               onkeydown="if(event.key==='Enter' && !state.answered && state.currentAnswer !== null) submitAnswer();"
+               ${state.answered ? 'disabled' : 'autofocus'}>
+        <span class="numeric-units">${q.units || ''}</span>
+      </div>
+    `;
+  }
+  if (q.type === 'match') {
+    // currentAnswer holds: { pairs: { leftIdx: rightIdx }, picking: leftIdx | null }
+    if (!state.currentAnswer || typeof state.currentAnswer !== 'object') {
+      state.currentAnswer = { pairs: {}, picking: null };
+    }
+    const ans = state.currentAnswer;
+    const rightShuffled = q._shuffledRight || (q._shuffledRight = shuffle(q.pairs.map((p, i) => ({ text: p.right, originalIdx: i }))));
+    let html = '<div class="match-grid">';
+    // Left column
+    html += '<div><div class="match-col-label">TERMS</div>';
+    q.pairs.forEach((p, i) => {
+      const paired = ans.pairs[i] !== undefined;
+      const selected = ans.picking === i;
+      const pairTag = paired ? `<span class="match-pair-tag">[${getPairLetter(ans.pairs[i], rightShuffled)}]</span>` : '';
+      let revealCls = '';
+      if (state.answered) {
+        revealCls = ans.pairs[i] === i ? 'correct' : 'wrong';
+        revealCls = revealCls === 'correct' ? 'paired' : 'wrong';
+      }
+      html += `<div class="match-item ${paired ? 'paired' : ''} ${selected ? 'selected' : ''} ${state.answered ? revealCls : ''}"
+                onclick="pickMatchLeft(${i})">${pairTag}${p.left}</div>`;
+    });
+    html += '</div>';
+    // Right column (shuffled)
+    html += '<div><div class="match-col-label">DEFINITIONS</div>';
+    rightShuffled.forEach((r, displayIdx) => {
+      const usedBy = Object.entries(ans.pairs).find(([l, rOrig]) => rOrig === r.originalIdx);
+      const paired = !!usedBy;
+      const letter = String.fromCharCode(65 + displayIdx);
+      html += `<div class="match-item ${paired ? 'paired' : ''}" onclick="pickMatchRight(${r.originalIdx})">
+                 <span class="match-pair-tag">[${letter}]</span>${r.text}
+               </div>`;
+    });
+    html += '</div></div>';
+    return html;
+  }
+  return '<div>Unsupported question type.</div>';
+}
+
+function getPairLetter(originalRightIdx, shuffledRight) {
+  const idx = shuffledRight.findIndex(r => r.originalIdx === originalRightIdx);
+  return String.fromCharCode(65 + idx);
+}
+
+function renderFeedback(q) {
+  const correct = state.lastCorrect;
+  return `
+    <div class="feedback ${correct ? 'correct' : 'wrong'}">
+      <div class="feedback-title">${correct ? '✓ CORRECT' : '✗ WRONG'}</div>
+      <div class="feedback-explain">${q.explain}</div>
+    </div>
+  `;
+}
+
+function renderResult() {
+  const room = ROOMS.find(r => r.id === state.currentRoomId);
+  const correct = state.roomResults.filter(r => r).length;
+  const total = state.roomResults.length;
+  const mastery = Math.round(100 * correct / total);
+  const stars = correct === total ? 3 : (correct >= 4 ? 2 : (correct >= 3 ? 1 : 0));
+  const pass = correct >= 4;
+
+  // Persist
+  if (pass) {
+    const existing = state.progress[room.id];
+    if (!existing || stars > existing.stars) {
+      state.progress[room.id] = { stars, mastery, completed: true };
+    } else {
+      state.progress[room.id].completed = true;
+    }
+    sfx.unlock();
+  } else {
+    sfx.wrong();
+  }
+  save();
+
+  app.innerHTML = `
+    ${renderHUD()}
+    <div class="result-screen">
+      <div class="result-headline ${pass ? '' : 'fail'}">${pass ? 'ROOM CLEARED' : 'ROOM FAILED'}</div>
+      <div class="result-room">${room.id} · ${room.name}</div>
+      <div class="result-stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+      <div class="result-stats">
+        <div class="result-stat">
+          <div class="result-stat-value">${correct}/${total}</div>
+          <div class="result-stat-label">CORRECT</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value">${mastery}%</div>
+          <div class="result-stat-label">MASTERY</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value">${state.streak}</div>
+          <div class="result-stat-label">CURRENT STREAK</div>
+        </div>
+      </div>
+      <div class="mt-lg">
+        <button class="btn" onclick="goMap()">RETURN TO MAP</button>
+        ${!pass ? `<button class="btn secondary" onclick="startRoom('${room.id}')">RETRY ROOM</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderBossIntro() {
+  sfx.boss();
+  app.innerHTML = `
+    ${renderHUD()}
+    <div class="result-screen boss-mode">
+      <div class="result-headline fail">★ FINAL ROUND ★</div>
+      <div class="result-room">EXAM SIMULATION · 15 questions · 12 minutes · No retry within run</div>
+      <div style="max-width: 600px; margin: 30px auto; line-height: 1.7; font-family: ui-sans-serif, system-ui, sans-serif; color: var(--muted);">
+        Mixed topics. Time pressure. 3 lives. <span style="color: var(--accent);">Get 12/15 to clear.</span>
+        Each correct answer worth 100 XP × streak multiplier. Boss XP awarded only on clear.
+      </div>
+      <div class="mt-lg">
+        <button class="btn danger" onclick="actuallyStartBoss()">▶ BEGIN</button>
+        <button class="btn secondary" onclick="goMap()">NOT YET</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderBossResult() {
+  const correct = state.roomResults.filter(r => r).length;
+  const total = state.roomResults.length;
+  const pass = correct >= 12;
+  if (pass) {
+    state.bossDone = true;
+    state.totalXp += 1000;
+    save();
+    sfx.unlock();
+  } else {
+    sfx.wrong();
+  }
+  app.innerHTML = `
+    ${renderHUD()}
+    <div class="result-screen boss-mode">
+      <div class="result-headline ${pass ? '' : 'fail'}">${pass ? '★ BOSS DEFEATED ★' : 'BOSS WON'}</div>
+      <div class="result-room">${correct}/${total} correct · ${Math.round(100*correct/total)}% mastery</div>
+      ${pass ? '<div style="color: var(--accent); margin: 30px 0; font-size: 18px;">+1000 BONUS XP · You are exam-ready.</div>' : '<div style="color: var(--muted); margin: 30px 0;">Return to the map, polish weak rooms, try again.</div>'}
+      <div class="mt-lg">
+        <button class="btn" onclick="goMap()">RETURN TO MAP</button>
+        ${!pass ? `<button class="btn danger" onclick="actuallyStartBoss()">RETRY BOSS</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// EVENT HANDLERS
+// ============================================================
+function goMap() {
+  sfx.click();
+  state.screen = 'map';
+  state.currentRoomId = null;
+  state.currentQIdx = 0;
+  state.currentAnswer = null;
+  state.answered = false;
+  state.roomResults = [];
+  state.lives = 3;  // refill lives between rooms
+  render();
+}
+
+function startRoom(id) {
+  sfx.click();
+  state.screen = 'room';
+  state.currentRoomId = id;
+  state.currentQIdx = 0;
+  state.currentAnswer = null;
+  state.answered = false;
+  state.roomResults = [];
+  state.lives = 3;
+  state.streak = 0;
+  // shuffle each room's MCQ option order? No — keep stable for muscle memory.
+  // Reset any shuffled match arrays so they re-shuffle on retry:
+  ROOMS.find(r => r.id === id).questions.forEach(q => { if (q.type === 'match') delete q._shuffledRight; });
+  render();
+}
+
+function pickOption(i) {
+  if (state.answered) return;
+  sfx.click();
+  state.currentAnswer = i;
+  render();
+}
+
+function pickMatchLeft(leftIdx) {
+  if (state.answered) return;
+  const ans = state.currentAnswer;
+  if (ans.pairs[leftIdx] !== undefined) {
+    // already paired — unpair
+    delete ans.pairs[leftIdx];
+    ans.picking = null;
+  } else {
+    ans.picking = leftIdx;
+  }
+  sfx.click();
+  render();
+  maybeFinalizeMatch();
+}
+
+function pickMatchRight(rightIdx) {
+  if (state.answered) return;
+  const ans = state.currentAnswer;
+  // if this right is already paired, do nothing
+  if (Object.values(ans.pairs).includes(rightIdx)) return;
+  if (ans.picking === null) return;
+  ans.pairs[ans.picking] = rightIdx;
+  ans.picking = null;
+  sfx.click();
+  render();
+  maybeFinalizeMatch();
+}
+
+function maybeFinalizeMatch() {
+  const q = ROOMS.find(r => r.id === state.currentRoomId)?.questions[state.currentQIdx]
+            || BOSS_POOL?.[state.currentQIdx];
+  if (!q || q.type !== 'match') return;
+  const ans = state.currentAnswer;
+  const pairCount = Object.keys(ans.pairs).length;
+  document.getElementById('submitBtn').disabled = pairCount !== q.pairs.length;
+}
+
+function submitAnswer() {
+  const room = state.bossActive
+    ? { questions: BOSS_POOL, id: 'BOSS' }
+    : ROOMS.find(r => r.id === state.currentRoomId);
+  const q = room.questions[state.currentQIdx];
+  let correct = false;
+  if (q.type === 'mcq') correct = state.currentAnswer === q.correct;
+  else if (q.type === 'error') correct = state.currentAnswer === q.wrongIndex;
+  else if (q.type === 'numeric') {
+    const ans = parseFloat(state.currentAnswer);
+    correct = !isNaN(ans) && Math.abs(ans - q.answer) <= (q.tolerance ?? 0.01);
+  } else if (q.type === 'match') {
+    correct = q.pairs.every((_, i) => state.currentAnswer.pairs[i] === i);
+  }
+
+  state.answered = true;
+  state.lastCorrect = correct;
+  state.roomResults.push(correct);
+
+  if (correct) {
+    state.streak++;
+    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+    const mult = Math.min(5, 1 + Math.floor(state.streak / 3));
+    const gain = (state.bossActive ? 100 : 50) * mult;
+    state.totalXp += gain;
+    sfx.correct();
+  } else {
+    state.streak = 0;
+    state.lives--;
+    sfx.wrong();
+  }
+  save();
+  render();
+
+  // If out of lives mid-room, end the room
+  if (state.lives <= 0 && !state.bossActive) {
+    setTimeout(() => endRoom(), 1400);
+  } else if (state.lives <= 0 && state.bossActive) {
+    setTimeout(() => endBoss(), 1400);
+  }
+}
+
+function nextQuestion() {
+  const room = state.bossActive ? { questions: BOSS_POOL } : ROOMS.find(r => r.id === state.currentRoomId);
+  state.currentQIdx++;
+  state.currentAnswer = null;
+  state.answered = false;
+  if (state.currentQIdx >= room.questions.length) {
+    if (state.bossActive) endBoss();
+    else endRoom();
+    return;
+  }
+  // Reset match answer if next is match
+  const nextQ = room.questions[state.currentQIdx];
+  if (nextQ.type === 'match') state.currentAnswer = { pairs: {}, picking: null };
+  render();
+}
+
+function endRoom() {
+  state.screen = 'result';
+  render();
+}
+
+function abandonRoom() {
+  if (!confirm('Leave this room? Progress within the room is lost.')) return;
+  goMap();
+}
+
+// ============================================================
+// BOSS
+// ============================================================
+let BOSS_POOL = [];
+function startBoss() {
+  sfx.click();
+  state.screen = 'boss-intro';
+  render();
+}
+
+function actuallyStartBoss() {
+  sfx.boss();
+  // Build pool: 10 random from rooms + 5 exclusive
+  const allRoomQs = ROOMS.flatMap(r => r.questions);
+  BOSS_POOL = [...shuffle(allRoomQs).slice(0, 10), ...BOSS_EXCLUSIVE].sort(() => Math.random() - 0.5);
+  // Clear any prior match shuffles
+  BOSS_POOL.forEach(q => { if (q.type === 'match') delete q._shuffledRight; });
+  state.bossActive = true;
+  state.screen = 'room';
+  state.currentRoomId = '★ BOSS ROUND ★';
+  state.currentQIdx = 0;
+  state.currentAnswer = BOSS_POOL[0].type === 'match' ? { pairs: {}, picking: null } : null;
+  state.answered = false;
+  state.roomResults = [];
+  state.lives = 3;
+  state.streak = 0;
+  // Patch the room lookup: render uses currentRoomId, so we wrap
+  render();
+}
+
+function endBoss() {
+  state.bossActive = false;
+  state.screen = 'boss-result';
+  render();
+}
+
+// Patch render() for boss: when bossActive, treat currentRoom as BOSS_POOL
+const originalRenderRoom = renderRoom;
+renderRoom = function() {
+  if (!state.bossActive) return originalRenderRoom();
+  const q = BOSS_POOL[state.currentQIdx];
+  if (!q) { state.screen = 'boss-result'; render(); return; }
+  let html = renderHUD();
+  html += `
+    <div class="question-header">
+      <div class="breadcrumb">// <span class="accent" style="color: var(--danger);">★ BOSS ROUND</span> · EXAM SIMULATION</div>
+      <div class="q-progress">Q ${state.currentQIdx + 1} / ${BOSS_POOL.length}</div>
+    </div>
+    <div class="question-card boss-mode">
+      <div class="q-type-badge" style="border-color: var(--danger); color: var(--danger);">${q.type.toUpperCase()}</div>
+      <div class="q-prompt">${q.prompt}</div>
+      ${renderQuestionBody(q)}
+      ${state.answered ? renderFeedback(q) : ''}
+      <div class="q-actions">
+        ${state.answered
+          ? `<button class="btn danger" onclick="nextQuestion()">${state.currentQIdx + 1 >= BOSS_POOL.length ? 'FINALIZE' : 'NEXT →'}</button>`
+          : `<button class="btn danger" id="submitBtn" onclick="submitAnswer()" ${state.currentAnswer === null || (typeof state.currentAnswer === 'object' && Object.keys(state.currentAnswer.pairs || {}).length !== (q.pairs?.length || 0)) ? 'disabled' : ''}>SUBMIT</button>`}
+        <button class="btn secondary" onclick="abandonBoss()">ABANDON</button>
+      </div>
+    </div>
+  `;
+  app.innerHTML = html;
+};
+
+function abandonBoss() {
+  if (!confirm('Abandon the boss round? You will need to clear all rooms again to retry.')) return;
+  state.bossActive = false;
+  goMap();
+}
+
+// ============================================================
+// UTIL
+// ============================================================
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+render();
+</script>
+</body>
+</html>
