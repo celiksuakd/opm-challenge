@@ -386,338 +386,314 @@
 
 const ROOMS = [
   {
-    id: 'L4', date: 'WK1', name: 'Heat Exchangers', questions: [
-      { type: 'mcq', prompt: 'LMTD in heat exchanger design stands for:',
-        options: ['Linear Mean Temperature Difference', 'Log Mean Temperature Difference', 'Local Maximum Temperature Difference', 'Limit of Mean Temperature Decay'],
-        correct: 1, explain: 'LMTD = ΔT_lm = (ΔT₁ − ΔT₂)/ln(ΔT₁/ΔT₂). The driving force for the design equation Q = U·A·LMTD·F. F = correction factor for non-pure counter/co-current.' },
-      { type: 'mcq', prompt: 'In a shell-and-tube exchanger, a corrosive or fouling fluid is preferentially placed on the:',
-        options: ['Shell side (more volume, less sensitive)', 'Tube side — tubes are easier to clean, replace, and resist higher pressure', 'Either, no preference', 'Whichever is hotter'],
-        correct: 1, explain: 'Tubes can be brushed/replaced individually; the shell is single-walled. Tube-side also handles higher P. Cooling water (fouling): tube-side. High-P steam: tube-side.' },
-      { type: 'numeric', prompt: 'Heat exchanger: U = 400 W/m²·K, A = 25 m², LMTD = 40 K (pure counter-current, F = 1). Heat duty Q? (kW)',
+    id: 'L4', date: 'WK1', name: 'Heat Exchangers — Design & Standards', questions: [
+      { type: 'mcq', prompt: 'Manenti distinguishes the RATING problem from the DESIGN problem (slide L4 p.5):',
+        options: ['They are the same', 'RATING = calculate required heat-transfer RATE from mass/energy balances; DESIGN = calculate required AREA from U and ΔT_lm', 'Both compute pressure drop', 'Rating is mechanical only'],
+        correct: 1, explain: 'Slide L4 p.5 (Manenti). Rating first (what duty?), then design (how big?). For cyclic equipment you also calculate the cycling time. Common student trap: jumping to area sizing without first nailing the duty.' },
+      { type: 'mcq', prompt: 'According to Manenti, the dominant design STANDARDS for shell-and-tube HEs are:',
+        options: ['ISO 9001 only', 'TEMA (Tubular Exchanger Manufacturers Association) + ASME-API Unfired Pressure Vessel Code', 'EN 1092', 'No standards'],
+        correct: 1, explain: 'Slide L4 p.6. TEMA classifies HEs by front/shell/rear-head type (E.G. AES, BEM, etc.). ASME governs pressure-vessel construction. Compliance is non-negotiable in most jurisdictions.' },
+      { type: 'mcq', prompt: 'Manenti\'s "compromise" example: HIGH fluid velocity inside small tubes:',
+        options: ['Has no downside', 'Improves heat-transfer coefficient (smaller area needed) BUT increases friction loss (pumping cost) — must optimize the trade', 'Always preferred', 'Reduces fouling only'],
+        correct: 1, explain: 'Slide L4 p.7. The eternal HE trade-off. Designers use ΔP allowance from the project basis to set a maximum velocity, then trade area against pumping power for minimum NPV.' },
+      { type: 'mcq', prompt: 'Manenti distinguishes LOCAL vs GLOBAL optimum in HE design. The global (plant) optimum considers:',
+        options: ['Just the unit price', 'The Heat Exchanger Network (HEN), plant-level OPEX/CAPEX, and heat integration — not just the single unit', 'Only ASME code', 'Only TEMA standards'],
+        correct: 1, explain: 'Slide L4 p.8. A locally-cheap HE may force expensive utility consumption at the plant level. Pinch analysis (later lecture) is the framework for global optimization.' },
+      { type: 'numeric', prompt: 'Heat exchanger: U = 400 W/m²·K, A = 25 m², LMTD = 40 K (pure counter-current, F=1). Heat duty Q? (kW)',
         answer: 400, tolerance: 5, units: 'kW',
-        explain: 'Q = U·A·LMTD = 400·25·40 = 400,000 W = 400 kW. Memorize this equation — it appears on every HE problem.' },
-      { type: 'match', prompt: 'Match each exchanger type to its typical strength.',
-        pairs: [
-          { left: 'Shell-and-tube', right: 'Workhorse: wide T/P range, moderate cost' },
-          { left: 'Plate-and-frame', right: 'Compact, high U, low ΔT — great for clean fluids and food/dairy' },
-          { left: 'Double-pipe', right: 'Small duty, high pressure, easy to clean' },
-          { left: 'Air-cooled (fin-fan)', right: 'No cooling water needed; large footprint' }
-        ], explain: 'Choose the geometry from duty, fluids, pressure, fouling, footprint. Shell-and-tube wins by default; everything else for a specific reason.' },
-      { type: 'error', prompt: 'One statement is FALSE.',
-        statements: [
-          'Counter-current flow gives a higher LMTD than co-current for the same terminal temperatures',
-          'Increasing fluid velocity improves film coefficient at the cost of pressure drop',
-          'Fouling resistance reduces the effective overall U',
-          'A 1-shell, 2-tube-pass exchanger achieves true counter-current LMTD'
-        ], wrongIndex: 3, explain: 'Multiple tube passes introduce co-current legs → need a correction factor F<1. True counter-current LMTD only with 1-1 configuration or a plate exchanger.' }
+        explain: 'Q = U·A·LMTD = 400·25·40 = 400 kW. The fundamental design equation — memorize it. Real designs add a correction factor F (< 1) for multi-pass / partial counter-current configurations.' }
     ]
   },
   {
-    id: 'L5', date: 'WK2', name: 'Solar Thermal', questions: [
-      { type: 'mcq', prompt: 'Concentrating Solar Power (CSP) types include all EXCEPT:',
-        options: ['Parabolic trough', 'Solar tower (central receiver)', 'Linear Fresnel reflector', 'Photovoltaic panel (PV)'],
-        correct: 3, explain: 'PV converts photons directly to electricity (no thermal cycle). CSP collects solar heat for a Rankine cycle. The four CSP types: parabolic trough, tower, dish/Stirling, linear Fresnel.' },
-      { type: 'mcq', prompt: 'In a parabolic-trough plant, the HEAT TRANSFER FLUID circulated through the receiver is typically:',
-        options: ['Liquid water', 'Synthetic thermal oil (up to ~400°C) or molten salt (up to ~565°C)', 'Air', 'Liquid sodium'],
-        correct: 1, explain: 'Therminol/Dowtherm at lower T; nitrate-salt mixtures (Solar Salt, 60% NaNO3 + 40% KNO3) for high T and thermal storage. Water is restricted to direct steam generation designs.' },
-      { type: 'mcq', prompt: 'CONCENTRATION RATIO of a CSP collector is defined as:',
-        options: ['Receiver power / collector power', 'Aperture area / receiver area', 'Sun angle / collector angle', 'Mirror reflectivity'],
-        correct: 1, explain: 'C = A_aperture / A_receiver. Trough: ~30-80. Tower / dish: 500-3000+. Higher C → higher achievable T but smaller receiver / harder optics.' },
-      { type: 'mcq', prompt: 'The main reason MOLTEN SALT is preferred for THERMAL STORAGE in CSP plants:',
-        options: ['It is cheaper than water', 'Stable at high T, high heat capacity per unit volume, enables 6-15 h dispatchable power', 'Self-heating from radioactivity', 'It is non-toxic'],
-        correct: 1, explain: 'Two-tank salt storage decouples solar input from electricity output → CSP becomes dispatchable, competing with gas turbines for evening peaks. Game-changer for CSP economics.' },
-      { type: 'match', prompt: 'Match each CSP technology to its operating temperature regime.',
-        pairs: [
-          { left: 'Parabolic trough (oil)', right: '~300–400°C' },
-          { left: 'Parabolic trough (molten salt)', right: '~500–565°C' },
-          { left: 'Solar tower', right: '~565–700°C+' },
-          { left: 'Flat plate (solar thermal hot water)', right: '<100°C' }
-        ], explain: 'Operating T = function of concentration ratio and HTF. Higher T → higher Carnot efficiency, but costlier materials. Sweet spot has shifted from troughs to towers.' }
+    id: 'L5', date: 'WK2', name: 'Solar Thermal & CSP', questions: [
+      { type: 'mcq', prompt: 'Concentrating Solar Power (CSP) is fundamentally different from photovoltaic because:',
+        options: ['It is more expensive', 'CSP collects solar HEAT for a thermal cycle (typically Rankine); PV converts photons directly to electricity', 'CSP uses semiconductors', 'They are the same'],
+        correct: 1, explain: 'CSP → thermal storage → dispatchable electricity. PV → direct electricity → needs batteries for storage. CSP\'s thermal-storage advantage is its main competitive edge over PV+battery.' },
+      { type: 'mcq', prompt: 'The CONCENTRATION RATIO of a CSP collector is:',
+        options: ['Receiver area / aperture area', 'C = APERTURE area / RECEIVER area (a higher C lets you reach a higher temperature)', 'Same as efficiency', 'Mirror reflectivity'],
+        correct: 1, explain: 'Larger C → smaller receiver, hotter T, higher Carnot efficiency, but harder optics. Parabolic trough: ~30-80. Tower / dish: 500-3000+.' },
+      { type: 'mcq', prompt: 'For HIGH-TEMPERATURE central-tower CSP, the heat transfer / storage fluid is typically:',
+        options: ['Liquid water', 'Molten salt (e.g., Solar Salt: 60% NaNO3 + 40% KNO3) — stable to ~565°C, enables 6-15 h thermal storage', 'Liquid sodium', 'Mineral oil'],
+        correct: 1, explain: 'Two-tank molten-salt storage decouples solar input from electricity output → CSP becomes dispatchable, competing with gas peakers for evening loads.' },
+      { type: 'mcq', prompt: 'A parabolic-trough CSP plant with synthetic thermal oil HTF typically operates up to:',
+        options: ['~100°C', '~400°C (oil thermal-stability limit)', '~800°C', '~1500°C'],
+        correct: 1, explain: 'Therminol/Dowtherm tops out around 400°C. Hence the industry shift to molten-salt direct steam generation (500-565°C) for better Rankine efficiency.' },
+      { type: 'mcq', prompt: 'Thermal energy STORAGE is the key competitive advantage of CSP because:',
+        options: ['It is cheaper than batteries', 'It makes CSP DISPATCHABLE — solar input is decoupled from electricity output, allowing evening/night production', 'Both', 'Neither'],
+        correct: 2, explain: 'Both, actually. Two-tank molten-salt storage is currently cheaper per kWh than lithium batteries for multi-hour-duration storage. CSP+storage competes with gas peakers, not just baseload solar.' }
     ]
   },
   {
     id: 'L6', date: 'WK3', name: 'Pinch Technology', questions: [
-      { type: 'mcq', prompt: 'Pinch Technology is best described as:',
-        options: ['A method for sizing distillation columns', 'A systematic method for energy-targeting and heat-integration of process streams', 'A control-loop tuning method', 'A way to reduce reactor volume'],
-        correct: 1, explain: 'Linnhoff & Hindmarsh, late 1970s. Targets MINIMUM hot/cold utilities before designing any HX network. Drives plant energy bills down 20–40% on average.' },
-      { type: 'mcq', prompt: 'ΔT_min (minimum approach temperature) in pinch analysis represents:',
-        options: ['The lowest stream temperature in the plant', 'The smallest allowed approach between hot and cold streams in any single exchanger', 'The difference between hottest and coldest streams', 'A control offset'],
-        correct: 1, explain: 'ΔT_min is a degree-of-freedom: smaller → less utility but more area (capital). Typical 10–20°C for refining, 5–10°C for compact plate exchangers.' },
-      { type: 'mcq', prompt: 'The "PINCH POINT" on a composite-curve diagram is:',
-        options: ['Where streams cross', 'The location where the temperature gap between hot and cold composite curves equals ΔT_min', 'The hottest utility', 'Where the most heat is exchanged'],
-        correct: 1, explain: 'The pinch divides the system into a HEAT SINK (above pinch, needs hot utility) and a HEAT SOURCE (below pinch, needs cold utility). It is the bottleneck of integration.' },
-      { type: 'mcq', prompt: 'The three "golden rules" of pinch design are: (1) no heat across the pinch, (2) no cold utility above the pinch, (3) no hot utility below the pinch. Violating any of them:',
-        options: ['Saves utility', 'Wastes 1 kW of hot AND 1 kW of cold utility per kW transferred across the pinch', 'Is required by safety codes', 'Has no thermodynamic consequence'],
-        correct: 1, explain: 'Cross-pinch heat transfer is a DOUBLE penalty: you pay for the heat in (above pinch) AND the heat dumped (below pinch). The pinch is the energy bookkeeping boundary.' },
-      { type: 'numeric', prompt: 'A simple integration problem yields a required hot utility of 1500 kW. After applying pinch design (ΔT_min = 10°C), the new minimum hot utility (MER) is 600 kW. Energy savings as a percentage? (%)',
-        answer: 60, tolerance: 0.5, units: '%',
-        explain: '(1500 − 600)/1500 = 60% reduction. Real-plant savings of 20-40% are typical; 60% is at the upper bound of what pinch can target.' }
+      { type: 'mcq', prompt: 'Manenti defines PINCH TECHNOLOGY as (slide L6 p.3):',
+        options: ['Way to size pumps', '"Systematic methodology for energy saving" — starting from process flowsheeting, highlights heating/cooling demands WITHOUT reference to existing HEs', 'A safety method', 'A control method'],
+        correct: 1, explain: 'Slide L6 p.3-4 (Manenti). Key word: SYSTEMATIC. Pinch targets the MINIMUM utility consumption BEFORE you design any specific HE — then designs to that target.' },
+      { type: 'mcq', prompt: 'A stream\'s "CP" in pinch analysis is defined as:',
+        options: ['Constant pressure', 'CP = c_p · M (specific heat × mass flow rate) — the enthalpy change per unit temperature, in kW/°C', 'Pressure ratio', 'Closed-loop pole'],
+        correct: 1, explain: 'Slide L6 p.5 (Manenti). CP = ṁ · c_p, units kW/°C. The slope of the T-H profile on the composite curve for that stream.' },
+      { type: 'mcq', prompt: 'The PINCH POINT on a composite-curve diagram corresponds to:',
+        options: ['The hottest stream', 'The location where the temperature gap between hot and cold composite curves equals ΔT_min', 'The coldest utility', 'The largest exchanger'],
+        correct: 1, explain: 'Slide L6 p.10-11. The pinch divides the network into a HEAT SINK (above pinch, needs hot utility) and a HEAT SOURCE (below pinch, needs cold utility). Bottleneck of energy integration.' },
+      { type: 'mcq', prompt: 'Manenti\'s THREE GOLDEN RULES of pinch design:',
+        options: ['Random principles', '(1) NO heat transfer ACROSS the pinch, (2) NO cold utility ABOVE the pinch, (3) NO hot utility BELOW the pinch — violate any of them and you waste 1 kW of hot + 1 kW of cold utility per kW crossed', 'Always cross the pinch', 'Use cold utility everywhere'],
+        correct: 1, explain: 'Slide L6 / standard pinch theory. Cross-pinch heat transfer is a DOUBLE penalty. Most retrofit savings come from identifying and removing cross-pinch HEs.' },
+      { type: 'numeric', prompt: 'A simple integration: required hot utility before pinch = 1500 kW; after pinch design (ΔT_min = 10°C), MER = 600 kW. Energy savings? (%)',
+        answer: 60, tolerance: 1, units: '%',
+        explain: '(1500 − 600)/1500 = 60% reduction. Real-plant savings typically 20-40%; 60% is upper-bound. Manenti\'s example composite curve in the slides yields ΔT_min = 10°C ⇒ Q_C,min ≈ 120 kW for the shifted cold curve.' }
     ]
   },
   {
     id: 'L7', date: 'WK4', name: 'Heat Pumps', questions: [
-      { type: 'mcq', prompt: 'The COP (Coefficient of Performance) of a heating heat pump is defined as:',
-        options: ['Q_cold / W_in', 'Q_hot delivered / W_in (work input)', 'Q_hot / Q_cold', 'W_in / Q_hot'],
-        correct: 1, explain: 'Heating COP_h = Q_h / W. Carnot ceiling: COP_carnot = T_h / (T_h − T_c). Real units: 3-5 typical for residential, lower for high-T process applications.' },
-      { type: 'mcq', prompt: 'Mechanical Vapor Recompression (MVR) is most attractive when:',
-        options: ['Distillation column ΔT between top and bottom is large', 'Distillation column ΔT is small (close-boiling), so the compressor can boost overhead vapor to reboil bottoms', 'There is no condenser duty', 'Steam is free'],
-        correct: 1, explain: 'MVR: compress the overhead vapor enough to use it as the reboiler heat source. Pays off when ΔT_col is small (low compressor work needed). Common in salt evaporators, brewing, some distillations.' },
-      { type: 'mcq', prompt: 'In the classic vapor-compression cycle, the four components in order are:',
-        options: ['Evaporator → Compressor → Condenser → Expansion valve', 'Compressor → Evaporator → Condenser → Pump', 'Condenser → Evaporator → Compressor → Heater', 'Pump → Evaporator → Turbine → Condenser'],
-        correct: 0, explain: 'Refrigerant: low-P vapor → compressor (raise P, T) → condenser (reject Q_h) → expansion valve (drop P, T) → evaporator (absorb Q_c). Same cycle as your fridge, scaled up.' },
-      { type: 'numeric', prompt: 'A heat pump delivers Q_h = 12 kW of heat to a process while consuming W = 3 kW of electric power. COP_h?',
+      { type: 'mcq', prompt: 'Manenti opens L7 with Clausius\' 2nd-principle statement (slide L7 p.3):',
+        options: ['"Energy is conserved"', '"Heat can never pass from a colder to a warmer body without some other change, connected therewith, occurring at the same time."', 'Carnot efficiency formula', 'Maxwell equations'],
+        correct: 1, explain: 'Slide L7 p.3 (Manenti, citing Clausius 1854 original). The "other change" is the work input. Heat pumps and refrigerators are the same machine — what differs is which side (hot or cold) is the useful output.' },
+      { type: 'mcq', prompt: 'A HEAT PUMP and a FRIDGE differ by:',
+        options: ['Refrigerant type only', 'Which side is the USEFUL OUTPUT: heat pump delivers Q_HOT to the user; fridge removes Q_COLD from the user. Same machine, mirrored.', 'Compressor size', 'Tubing material'],
+        correct: 1, explain: 'Slide L7 p.5 (Manenti). The 1st law gives Q_HOT = Q_COLD + W. Heat pump COP_h = Q_HOT/W; Fridge COP_c = Q_COLD/W. Carnot relation: COP_h = COP_c + 1.' },
+      { type: 'mcq', prompt: 'The COP of a HEATING heat pump is:',
+        options: ['Q_cold / W', 'COP_h = Q_HOT delivered / W work input', 'Q_hot / Q_cold', 'W / Q_hot'],
+        correct: 1, explain: 'Carnot ceiling: COP_h = T_h / (T_h − T_c). Real residential units: 3-5. High-T process heat pumps: 2-3. Higher temperature LIFT → lower COP.' },
+      { type: 'numeric', prompt: 'A heat pump delivers Q_h = 12 kW of heat while consuming W = 3 kW of electricity. COP_h?',
         answer: 4, tolerance: 0.1, units: '',
-        explain: 'COP_h = Q_h / W = 12 / 3 = 4. Meaning: for every 1 kWh of electricity, 4 kWh of heat are delivered. The other 3 kWh come from the cold source.' },
-      { type: 'error', prompt: 'One statement is FALSE.',
-        statements: [
-          'A heat pump always satisfies COP_h = COP_c + 1',
-          'Higher temperature lift (T_h − T_c) reduces COP',
-          'Refrigerant choice is constrained by safety, environment (GWP, ODP) and operating range',
-          'A heat pump can have COP > 1 with no thermodynamic violation'
-        ], wrongIndex: 0, explain: 'COP_h = COP_c + 1 is the IDEAL Carnot relation. For real cycles with irreversibilities the equality breaks (COP_h ≈ COP_c + 1 only approximately). The other three statements are exact.' }
+        explain: 'COP_h = Q_h / W = 12/3 = 4. For every 1 kWh electric input → 4 kWh thermal output. The "extra" 3 kWh is pumped from the cold source.' },
+      { type: 'mcq', prompt: 'MVR (Mechanical Vapor Recompression) is most attractive in distillation when:',
+        options: ['Column ΔT is large', 'Column ΔT (top vs bottom) is SMALL (close-boiling mixture) — compressor work to boost overhead vapor to reboil bottoms is modest', 'Steam is free', 'There is no condenser duty'],
+        correct: 1, explain: 'MVR pays off when ΔT_col is small. Common in salt evaporators (brackish water desalination), brewing, some petrochemical splits.' }
     ]
   },
   {
     id: 'L8', date: 'WK5', name: 'Cooling Towers', questions: [
-      { type: 'mcq', prompt: 'The COOLING TOWER "RANGE" is defined as:',
-        options: ['T_hot_water_in − T_cold_water_out', 'T_cold_water_out − T_wet_bulb', 'T_dry_bulb − T_wet_bulb', 'T_hot_water_in − T_dry_bulb'],
-        correct: 0, explain: 'Range = how much the cooling water is cooled (in - out). Typical 8-12°C. Set by the process duty, not the tower itself.' },
-      { type: 'mcq', prompt: 'The cooling tower "APPROACH" is defined as:',
-        options: ['T_cold_water_out − T_wet_bulb', 'T_hot_water_in − T_cold_water_out', 'T_dry_bulb − T_wet_bulb', 'T_hot − T_dry_bulb'],
-        correct: 0, explain: 'Approach = how close the outlet water gets to the air WET-BULB temperature (the thermodynamic minimum). Typical 3–8°C. Smaller approach → bigger/more expensive tower.' },
-      { type: 'mcq', prompt: 'COUNTER-FLOW vs CROSS-FLOW cooling towers:',
-        options: ['Counter-flow is always smaller for the same duty', 'Counter-flow gives the best thermal performance but slightly larger pumping head', 'Cross-flow uses less air', 'They are identical'],
-        correct: 1, explain: 'Counter-flow: best driving force, smaller footprint, but water-pump head higher. Cross-flow: cheaper distribution, lower head, taller structure. Most large process plants use counter-flow.' },
-      { type: 'mcq', prompt: 'Cooling-tower water-balance terms include EVAPORATION, DRIFT (entrained droplets), BLOWDOWN (purge to prevent salt build-up), and:',
-        options: ['Adsorption', 'Make-up water (added to compensate the losses)', 'Crystallization', 'Distillation'],
-        correct: 1, explain: 'Make-up replaces E + D + B. Cycles of concentration = make-up/blowdown. Higher CoC → less make-up but harsher water chemistry → more scaling/biocide cost.' },
-      { type: 'numeric', prompt: 'A cooling tower cools water from 40°C to 30°C; the design wet-bulb T_wb = 26°C. Compute the APPROACH. (°C)',
+      { type: 'mcq', prompt: 'Cooling tower RANGE is:',
+        options: ['T_water_out − T_wet_bulb', 'T_water_in − T_water_out (how much the water is cooled)', 'T_dry_bulb − T_wet_bulb', 'T_water_in − T_wet_bulb'],
+        correct: 1, explain: 'Range = the duty of the tower (set by the process). Typical 8-12°C. Independent of tower size in principle.' },
+      { type: 'mcq', prompt: 'Cooling tower APPROACH is:',
+        options: ['T_water_out − T_WET_BULB (the thermodynamic minimum)', 'T_water_in − T_water_out', 'T_dry_bulb − T_wet_bulb', 'Always 1°C'],
+        correct: 0, explain: 'Approach = how close the outlet water gets to the air wet-bulb (the minimum). Typical 3-8°C. Smaller approach → bigger/more expensive tower. Sets the tower SIZE.' },
+      { type: 'mcq', prompt: 'COUNTER-FLOW cooling towers are typically preferred for large process plants because:',
+        options: ['Cheaper to build', 'Best thermal performance (highest mean driving force) and smaller footprint, at the cost of slightly higher water pumping head', 'Quieter', 'No drift'],
+        correct: 1, explain: 'Cross-flow is cheaper per kW but taller and less efficient. Most refineries / chemical plants run counter-flow.' },
+      { type: 'mcq', prompt: 'Cooling-tower water-balance involves four loss/replacement terms. The makeup water replaces:',
+        options: ['Just evaporation', 'Evaporation + DRIFT (entrained droplets) + BLOWDOWN (purge to control salt concentration)', 'Steam only', 'Spill only'],
+        correct: 1, explain: 'M = E + D + B. Cycles of concentration (CoC) = M/B. Higher CoC → less make-up but harsher chemistry → more biocide and inhibitor cost.' },
+      { type: 'numeric', prompt: 'A cooling tower cools water from 40°C to 30°C; design wet-bulb T_wb = 26°C. Approach? (°C)',
         answer: 4, tolerance: 0.1, units: '°C',
-        explain: 'Approach = T_out − T_wb = 30 − 26 = 4°C. A 4°C approach is tight (expensive); plants often relax to 6-8°C to reduce tower size.' }
+        explain: 'Approach = T_out − T_wb = 30 − 26 = 4°C. A 4°C approach is tight (expensive); 6-8°C is more typical.' }
     ]
   },
   {
     id: 'L9', date: 'WK6', name: 'Evaporators', questions: [
-      { type: 'mcq', prompt: 'A MULTI-EFFECT evaporator uses the vapor produced in one effect as the heat source for the next. To make this thermodynamically possible:',
-        options: ['Each effect operates at the same pressure', 'Each successive effect operates at LOWER pressure (and hence lower boiling T)', 'Each effect operates at higher pressure', 'Heat is provided externally to each effect'],
-        correct: 1, explain: 'Lower P → lower T_sat → the vapor from effect 1 can boil the liquid in effect 2. Triple-effect evaporators triple the "economy" (kg evaporated / kg steam) versus single-effect.' },
-      { type: 'mcq', prompt: 'The EVAPORATOR ECONOMY (or steam economy) is defined as:',
-        options: ['Total energy used / energy purchased', 'kg of vapor produced / kg of live steam consumed', 'Concentration ratio', 'Boiling-point elevation'],
-        correct: 1, explain: 'Economy ≈ N (number of effects) ideally; in practice slightly less due to BPE, heat losses, condensate flash. Single-effect: ~0.8-0.95; quadruple-effect: ~3-3.5.' },
-      { type: 'mcq', prompt: 'BOILING POINT ELEVATION (BPE) refers to:',
-        options: ['The pressure at which boiling occurs', 'The increase in boiling temperature of a solution relative to the pure solvent at the same P', 'The flash-vapor fraction', 'A pump shutoff condition'],
-        correct: 1, explain: 'Dissolved salt/sugar raises T_boil. Important for evaporator design — Dühring lines plot T_boil(solution) vs T_boil(pure solvent) at the same P. BPE eats away the available LMTD.' },
-      { type: 'mcq', prompt: 'FORWARD FEED vs BACKWARD FEED in multi-effect evaporation:',
-        options: ['Forward = feed enters last effect; Backward = feed enters first', 'Forward = feed and steam flow same direction (effect 1 → N); Backward = feed enters last effect (N), steam enters first', 'They are identical', 'Backward is always preferred'],
-        correct: 1, explain: 'Forward: simple, no pumping (gravity, P-driven); but most-concentrated product sees coldest effect → worst U. Backward: better U on the concentrated side, but needs pumps against P. Pick based on viscosity, fouling.' },
-      { type: 'numeric', prompt: 'A triple-effect evaporator consumes 3000 kg/h of live steam and produces 8400 kg/h of vapor total. Steam economy?',
-        answer: 2.8, tolerance: 0.1, units: '',
-        explain: 'Economy = 8400/3000 = 2.8. Close to the theoretical maximum of 3 for triple-effect. Real losses (BPE, sensible heating of feed) limit you to ~2.5-2.8.' }
+      { type: 'mcq', prompt: 'Manenti defines EVAPORATION as (slide L9 p.3):',
+        options: ['Same as drying', 'Concentration of a solution of a NON-VOLATILE solute and a VOLATILE solvent by evaporating part of the solvent', 'Same as crystallization', 'Same as distillation'],
+        correct: 1, explain: 'Slide L9 p.3 (Manenti). Distinguished from: drying (residue solid), distillation (multi-component vapor fractionated), crystallization (crystal growth focus). Solvent is usually water.' },
+      { type: 'mcq', prompt: 'In a typical industrial evaporator (Manenti L9 p.7), the steam side and the boiling-liquid side operate at:',
+        options: ['Both atmospheric', 'Steam at LOW pressure (often < 3 bara) and boiling liquid under MODERATE VACUUM (down to 0.05 bara) — this maximizes ΔT and heat-transfer rate', 'Steam at 100 bar', 'Both at 50 bar'],
+        correct: 1, explain: 'Slide L9 p.7. Lowering the liquid boiling point (via vacuum) widens the available temperature difference for heat transfer, allowing smaller area or higher duty per evaporator.' },
+      { type: 'mcq', prompt: 'A MULTI-EFFECT evaporator uses the vapor produced in one effect to heat the next. To make it work thermodynamically:',
+        options: ['All effects at the same P', 'Each successive effect operates at LOWER pressure (and hence lower boiling T) so the vapor from effect i can boil the liquid in effect i+1', 'Each at higher P', 'External heating to each'],
+        correct: 1, explain: 'Slide L9 multi-effect page. N effects ≈ N× the steam economy (real losses limit to ~0.8-3.5 for 1- to 4-effect plants).' },
+      { type: 'mcq', prompt: 'STEAM ECONOMY of an evaporator is defined as:',
+        options: ['Total revenue / steam cost', 'kg of vapor produced / kg of live steam consumed', 'Concentration ratio', 'BPE'],
+        correct: 1, explain: 'Slide L9. Single-effect: ~0.8-0.95. Triple-effect: ~2.5-2.8. Limit is N (the theoretical max for N effects), reduced by BPE losses and condensate flash.' },
+      { type: 'mcq', prompt: 'BOILING POINT ELEVATION (BPE) in evaporator design:',
+        options: ['Negligible always', 'Dissolved salt/sugar raises T_boil(solution) above T_boil(pure solvent) at the same P — eats into available ΔT for heat transfer; tracked via Dühring lines', 'Reduces steam economy by exactly 50%', 'Only for organic solvents'],
+        correct: 1, explain: 'Slide L9. BPE can be substantial for concentrated brines or sugar syrups (10-30°C). Multi-effect plants must allocate enough ΔT per effect to overcome BPE.' }
     ]
   },
   {
     id: 'L10', date: 'WK7', name: 'Crystallization', questions: [
-      { type: 'mcq', prompt: 'The thermodynamic DRIVING FORCE for crystallization is:',
-        options: ['Temperature', 'Pressure', 'SUPERSATURATION (the gap between actual concentration and equilibrium solubility)', 'pH'],
-        correct: 2, explain: 'No supersaturation → no crystallization. Generated by cooling, evaporation, antisolvent addition, or reaction. Operating "metastable zone" (slightly supersat) → crystal growth without runaway nucleation.' },
-      { type: 'mcq', prompt: 'NUCLEATION vs GROWTH in crystallization:',
-        options: ['Same process at different scales', 'Nucleation = formation of new crystal nuclei (strong supersaturation dependence); Growth = enlargement of existing crystals', 'Growth precedes nucleation', 'Only growth matters for product quality'],
-        correct: 1, explain: 'Balance is the whole game. Too much nucleation → many tiny crystals (hard to filter/wash). Too little → few giant crystals (encapsulate mother liquor). Seeding controls the balance.' },
-      { type: 'mcq', prompt: 'The MSMPR (Mixed-Suspension Mixed-Product Removal) model assumes:',
-        options: ['Perfect mixing of liquid + crystals, classified-product withdrawal', 'Perfect mixing of liquid AND crystals, with product withdrawn proportional to suspension', 'Plug flow', 'Stationary crystals'],
-        correct: 1, explain: 'MSMPR = CSTR analogue for crystallizers. Crystal Size Distribution (CSD) is exponential (in number basis): n(L) = n₀·exp(−L/Gτ). Cornerstone of population balance modeling.' },
-      { type: 'mcq', prompt: 'Three modes of generating supersaturation:',
-        options: ['Cooling, evaporation, antisolvent (or reaction)', 'Heating, freezing, ultrasound', 'Light, magnetism, pH', 'Stirring, settling, filtering'],
-        correct: 0, explain: 'Cooling crystallization: works when solubility is strongly T-dependent. Evaporative: weak T-dependence (e.g., NaCl). Antisolvent/precipitation: add a solvent that drops solubility. Reactive: precipitate from reaction product.' },
+      { type: 'mcq', prompt: 'The DRIVING FORCE for crystallization is:',
+        options: ['Temperature alone', 'Pressure alone', 'SUPERSATURATION — concentration above the equilibrium solubility curve', 'pH'],
+        correct: 2, explain: 'No supersaturation → no crystals. Operating in the metastable zone (slightly supersaturated) gives growth without runaway nucleation.' },
+      { type: 'mcq', prompt: 'NUCLEATION vs GROWTH:',
+        options: ['Same thing', 'Nucleation = new crystal formation (strongly supersaturation-dependent); Growth = enlargement of existing crystals (more moderate)', 'Growth precedes nucleation', 'Only growth matters'],
+        correct: 1, explain: 'Balance is the whole control challenge. Too much nucleation → fine crystals (hard to filter/wash). Too little → giant crystals (encapsulate mother liquor). Seeding controls the balance.' },
+      { type: 'mcq', prompt: 'The MSMPR model (Mixed-Suspension Mixed-Product Removal) assumes:',
+        options: ['Plug flow', 'Perfect mixing of liquid AND crystals, with product withdrawn in proportion to suspension composition', 'Stagnant crystals', 'No mixing'],
+        correct: 1, explain: 'MSMPR = "CSTR for crystallizers." Population balance gives exponential CSD: n(L) = n0·exp(−L/Gτ).' },
+      { type: 'mcq', prompt: 'Three classical methods to generate supersaturation:',
+        options: ['Heating, freezing, ultrasound', 'COOLING (when solubility is strongly T-dependent), EVAPORATION (weak T-dep, e.g., NaCl), ANTISOLVENT addition (lowers solubility)', 'Light, magnetism, pH', 'Stirring, settling, filtering'],
+        correct: 1, explain: 'Plus reactive crystallization (precipitate from reaction product). Choice depends on the solubility curve of the target compound.' },
       { type: 'error', prompt: 'One statement is FALSE.',
         statements: [
-          'CSD (Crystal Size Distribution) determines downstream filtration and drying performance',
+          'CSD determines downstream filtration and drying performance',
           'Seeding suppresses primary nucleation and gives a narrower CSD',
-          'Higher supersaturation always gives larger crystals',
-          'Population balance equations are the standard mathematical framework for sizing crystallizers'
-        ], wrongIndex: 2, explain: 'Backwards: HIGH supersaturation favors NUCLEATION → many SMALL crystals. Slow, controlled supersaturation favors growth → larger crystals.' }
+          'HIGHER supersaturation always gives larger crystals',
+          'Population balance equations are the standard sizing framework'
+        ], wrongIndex: 2, explain: 'Backwards. HIGH supersaturation favors nucleation → many SMALL crystals. Slow, controlled supersaturation favors growth → larger crystals.' }
     ]
   },
   {
     id: 'L11', date: 'WK8', name: 'Filtration', questions: [
-      { type: 'mcq', prompt: 'CAKE FILTRATION vs DEEP-BED FILTRATION:',
-        options: ['Same thing', 'Cake: particles form a layer on the medium and become the actual filter; Deep-bed: particles captured throughout the depth of a porous bed', 'Cake is always for liquids, deep-bed for gases', 'Cake uses higher pressure'],
-        correct: 1, explain: 'Cake: high solids loading, ~µm-mm particles, batch (filter press). Deep-bed: low solids, sub-µm particles, continuous (sand filter, cartridge). Two fundamentally different physics.' },
+      { type: 'mcq', prompt: 'CAKE vs DEEP-BED filtration:',
+        options: ['Same', 'Cake: particles form a layer on the medium and become the actual filter (high-solids, batch). Deep-bed: particles captured throughout the depth of a porous bed (low-solids, continuous)', 'Cake is always for gas', 'Cake is faster'],
+        correct: 1, explain: 'Two fundamentally different physics. Choice based on solids loading: cake for slurries; deep-bed for polishing.' },
       { type: 'mcq', prompt: 'DEAD-END vs CROSS-FLOW filtration:',
-        options: ['Identical', 'Dead-end: feed flow perpendicular to membrane, cake grows; Cross-flow: tangential feed sweeps cake off, steady state possible', 'Cross-flow is only for gas', 'Dead-end has higher throughput'],
-        correct: 1, explain: 'Membrane processes (UF, MF, NF, RO) usually run cross-flow → tangential shear keeps cake thin. Cartridge/sterile filters run dead-end → simple, replace when fouled.' },
-      { type: 'match', prompt: 'Match each filter type to its typical service.',
-        pairs: [
-          { left: 'Filter press (plate-and-frame)', right: 'Batch dewatering of concentrated slurries' },
-          { left: 'Rotary drum vacuum filter', right: 'Continuous filtration of moderate-solids slurry' },
-          { left: 'Belt filter', right: 'Continuous wash + dewatering, e.g., mineral processing' },
-          { left: 'Cartridge filter', right: 'Polishing of low-solids streams' }
-        ], explain: 'Match the equipment to (batch vs continuous), solids loading, washing needs, and product purity. Rotary drum is the workhorse of moderate-duty industrial filtration.' },
+        options: ['Identical', 'Dead-end: feed perpendicular to medium, cake grows continuously (cartridge, sterile). Cross-flow: tangential feed sweeps cake (membrane: UF/MF/NF/RO)', 'Dead-end is faster', 'Cross-flow is for solids only'],
+        correct: 1, explain: 'Cross-flow is the modern workhorse for low-solids polishing where membrane fouling is a concern.' },
+      { type: 'mcq', prompt: 'A ROTARY DRUM vacuum filter is typically used for:',
+        options: ['Sterile pharma filtration', 'CONTINUOUS filtration of moderate-solids slurries — broad industrial workhorse (mining, food, chemicals)', 'Cake-free fluids only', 'High-vacuum processes only'],
+        correct: 1, explain: 'Vacuum draws liquid through medium; doctor blade scrapes cake off the rotating drum. Continuous duty, moderate cake thickness.' },
       { type: 'mcq', prompt: 'FILTER AIDS (e.g., diatomaceous earth, perlite) are used to:',
-        options: ['Lower temperature', 'Form a porous pre-coat or be slurried with the feed to prevent membrane blinding and improve cake permeability', 'Reduce pressure drop in vessels', 'Heat the cake'],
-        correct: 1, explain: 'Compressible/sticky slurries blind the medium fast. Filter aid pre-coat creates a rigid porous layer that catches the fines while letting filtrate through. Common in food, juice, fermentation.' },
-      { type: 'numeric', prompt: 'For constant-pressure CAKE filtration, the integral form is t = α·V²/2 + β·V. If filtering 5 m³ takes 25 min, neglecting medium resistance (β→0), how long does 10 m³ take? (min)',
+        options: ['Heat the cake', 'Form a porous pre-coat or be slurried with the feed to prevent membrane blinding and improve cake permeability', 'Reduce vessel ΔP only', 'Cool the filtrate'],
+        correct: 1, explain: 'Common in food (juice, beer, fermentation broths). Compressible/sticky slurries blind the medium fast — filter aid rescues them.' },
+      { type: 'numeric', prompt: 'For constant-pressure CAKE filtration, t ∝ V². If 5 m³ takes 25 min, how long does 10 m³ take? (min)',
         answer: 100, tolerance: 1, units: 'min',
-        explain: 't ∝ V². Double the volume → 4× the time. 25 min × 4 = 100 min. Foundational for batch filtration sizing.' }
+        explain: 'Double the volume → 4× the time. 25 × 4 = 100 min. Foundational for batch filtration scheduling.' }
     ]
   },
   {
     id: 'L12', date: 'WK9', name: 'Drying & Spray Drying', questions: [
-      { type: 'mcq', prompt: 'The CONSTANT-RATE drying period corresponds to:',
-        options: ['The crystallization stage', 'Free moisture evaporation from a wet surface — rate is set by air conditions, NOT by the solid', 'Bound moisture diffusing out of the solid', 'Final cool-down'],
-        correct: 1, explain: 'During constant-rate, the surface is wet; rate = h·A·(T_air − T_wb)/λ. Independent of moisture content. Ends at the CRITICAL MOISTURE CONTENT — surface starts drying.' },
-      { type: 'mcq', prompt: 'In the FALLING-RATE period of drying:',
-        options: ['Drying rate is constant', 'Drying rate decreases as moisture content decreases; diffusion within the solid becomes limiting', 'Drying stops completely', 'Material rehydrates'],
-        correct: 1, explain: 'Below critical moisture: water has to diffuse through the dry surface layer. Slow, drying time often >> constant-rate time. Equilibrium moisture content (EMC) sets the asymptote.' },
+      { type: 'mcq', prompt: 'During the CONSTANT-RATE drying period:',
+        options: ['Drying rate is zero', 'Free moisture evaporates from a WET SURFACE — rate set by air conditions (T, humidity, velocity), not by the solid', 'Rate is exponentially decreasing', 'Cake compresses'],
+        correct: 1, explain: 'Rate = h·A·(T_air − T_wb)/λ. Surface T ≈ wet-bulb. Ends at CRITICAL MOISTURE CONTENT, when the surface starts drying out.' },
+      { type: 'mcq', prompt: 'In the FALLING-RATE period:',
+        options: ['Drying rate constant', 'Drying rate decreases as moisture content decreases — internal diffusion through the dry surface layer becomes limiting; equilibrium moisture content (EMC) is the asymptote', 'No drying happens', 'Surface stays wet'],
+        correct: 1, explain: 'Below critical moisture, drying time often >> constant-rate time. EMC depends on the solid and air conditions.' },
       { type: 'mcq', prompt: 'In a SPRAY DRYER:',
-        options: ['Material is dried as a thin film on a heated surface', 'Liquid feed is atomized into fine droplets and contacted with hot drying air → product is collected as powder', 'A vacuum freezes the product', 'Microwaves heat the product'],
-        correct: 1, explain: 'Atomizer (rotary disc or nozzle) → drying chamber with hot air → cyclone + bag filter for fines. Milliseconds of residence → great for heat-sensitive (milk powder, pharma, instant coffee).' },
-      { type: 'match', prompt: 'Match each industrial dryer to its typical product.',
+        options: ['Film on heated wall', 'Liquid feed is ATOMIZED into fine droplets and contacted with hot drying air → product collected as powder (cyclone + bag filter); millisecond residence', 'Microwave heating', 'Vacuum freezing'],
+        correct: 1, explain: 'Great for heat-sensitive products (milk powder, instant coffee, pharma) because the droplet cools to ~wet-bulb during evaporation.' },
+      { type: 'match', prompt: 'Match each industrial dryer to its typical service.',
         pairs: [
-          { left: 'Spray dryer', right: 'Heat-sensitive liquids → free-flowing powder (milk, instant coffee)' },
-          { left: 'Fluidized-bed dryer', right: 'Granular solids; gentle agitation, uniform T' },
-          { left: 'Rotary kiln dryer', right: 'Coarse solids in bulk (minerals, fertilizers)' },
+          { left: 'Spray dryer', right: 'Heat-sensitive liquids → fine powder' },
+          { left: 'Fluidized-bed dryer', right: 'Granular solids, uniform T' },
+          { left: 'Rotary kiln dryer', right: 'Coarse bulk solids (minerals, fertilizers)' },
           { left: 'Tray (batch) dryer', right: 'Small batches, pilot, pharma' }
-        ], explain: 'Pick by feed form (liquid, slurry, paste, granule, sheet) and product sensitivity. Spray + fluid-bed are the two most "modern" industrial choices for fine powders.' },
-      { type: 'error', prompt: 'One statement is FALSE.',
+        ], explain: 'Match by feed form (liquid/slurry/granule/sheet) and product sensitivity.' },
+      { type: 'error', prompt: 'One is FALSE.',
         statements: [
-          'Air temperature, humidity, and velocity all affect the constant-rate drying rate',
-          'Equilibrium moisture content depends on the solid and the air conditions',
-          'Lower air humidity always speeds the falling-rate period',
-          'During the constant-rate period the solid temperature is approximately the wet-bulb T'
-        ], wrongIndex: 2, explain: 'Falling rate is limited by internal diffusion / pore geometry. Air conditions matter only weakly. Lowering humidity helps the equilibrium endpoint but not the rate at higher moisture.' }
+          'Air T, humidity, and velocity all affect the constant-rate drying rate',
+          'EMC depends on both the solid and the air conditions',
+          'Lower air humidity ALWAYS speeds the falling-rate period equivalently',
+          'During constant-rate, the solid T ≈ wet-bulb T'
+        ], wrongIndex: 2, explain: 'Falling rate is limited by INTERNAL diffusion / pore geometry — air conditions have only weak effect on the rate at high moisture. Lowering humidity helps the equilibrium endpoint but not the kinetic rate.' }
     ]
   },
   {
     id: 'L14', date: 'WK10', name: 'Lyophilization (Freeze Drying)', questions: [
-      { type: 'mcq', prompt: 'Lyophilization is the:',
-        options: ['Same as spray drying', 'Removal of water from a frozen product by SUBLIMATION under vacuum (below the triple point)', 'High-temperature drying', 'Microwave drying'],
-        correct: 1, explain: 'Freeze → low-P sublimation → secondary desorption. Preserves heat-sensitive structure: pharmaceuticals, vaccines, plasma, gourmet coffee. Premium price, premium quality.' },
-      { type: 'mcq', prompt: 'The three sequential stages of a lyophilization cycle are:',
-        options: ['Mixing → heating → cooling', 'Freezing → primary drying (sublimation) → secondary drying (desorption of bound water)', 'Granulation → sieving → drying', 'Atomization → evaporation → collection'],
-        correct: 1, explain: 'Freezing sets ice crystal structure → cake porosity. Primary drying: sublime ice (slow, energy-intensive). Secondary: remove bound water by warming under vacuum. Whole cycle: hours to days.' },
-      { type: 'mcq', prompt: 'PRIMARY DRYING in lyophilization operates at:',
-        options: ['Above the boiling point', 'Pressure BELOW the triple point of water (~611 Pa), shelf T just above the eutectic / glass transition', 'Atmospheric pressure', 'Above 100°C'],
-        correct: 1, explain: 'Pressure < triple-point → liquid water can\'t exist → ice goes directly to vapor. Operating just BELOW eutectic temperature ensures the cake stays solid (collapse = lost product).' },
-      { type: 'mcq', prompt: 'EUTECTIC TEMPERATURE (or glass-transition T_g\') is critical because:',
-        options: ['It is when freezing begins', 'It is the maximum allowed temperature during primary drying; above it the frozen matrix collapses and product is lost', 'It corresponds to bound water release', 'It marks complete drying'],
-        correct: 1, explain: 'Cake collapse = melt-back / loss of porosity / poor reconstitution. Operate 2–5°C below eutectic for safety. Formulation excipients (mannitol, sucrose) tune this temperature.' },
-      { type: 'error', prompt: 'One statement is FALSE.',
+      { type: 'mcq', prompt: 'Manenti defines lyophilization as (slide L14 p.3):',
+        options: ['High-T air drying', 'A BATCH process to dry solids by SUBLIMATION of water (ice) at low T and vacuum conditions — useful for thermolabile matters (pharma actives, food, feed)', 'Sublimation at high P', 'Distillation'],
+        correct: 1, explain: 'Slide L14 p.3 (Manenti). Simple operation but LONG times and HIGH costs. Justified by product value (vaccines, biologics, gourmet food) where damage during conventional drying is prohibitive.' },
+      { type: 'mcq', prompt: 'A lyophilization cycle has THREE phases (Manenti slide L14 p.5):',
+        options: ['Mixing, heating, cooling', '(1) FREEZING (cold supply + vacuum prep), (2) PRIMARY DRYING — sublimation of ice (T strictly below melting point), (3) SECONDARY DRYING — desorption of remaining adsorbed water', 'Heating only', 'Two phases'],
+        correct: 1, explain: 'Slide L14 p.5. The 3-stage cycle is universal. Freezing sets ice morphology → cake porosity. Primary drying is the longest, energy-intensive phase. Secondary drying brings residual moisture to <1%.' },
+      { type: 'mcq', prompt: 'In the lyophilization chamber (Manenti L14 p.6-7):',
+        options: ['Open to atmosphere', 'Structures must resist VACUUM (external compression); racks hold product; intermediate radiant walls supply heat; TWO condensers (one operating, one cleaning) collect sublimated solvent', 'Just a freezer', 'No heat supply'],
+        correct: 1, explain: 'Slide L14 p.6-7 (Manenti). Twin condensers enable continuous-style operation despite the batch nature of the cycle.' },
+      { type: 'mcq', prompt: 'Primary drying operates at pressure:',
+        options: ['Atmospheric', 'BELOW the triple point of water (~611 Pa, 0.01°C) so liquid water CANNOT exist → ice → vapor directly. Shelf T set just above the eutectic to maximize rate without collapse.', 'Above 1 bar', 'Same as boiler'],
+        correct: 1, explain: 'Below triple-point P, the equilibrium phase diagram shows no liquid region. Operate just below eutectic T (or T_g\' for amorphous formulations) to avoid cake collapse and loss of porosity.' },
+      { type: 'error', prompt: 'One is FALSE.',
         statements: [
-          'Lyophilization preserves heat-sensitive products with minimal damage',
+          'Lyophilization preserves heat-sensitive products with minimal thermal damage',
           'It is more expensive per kg of water removed than spray drying',
           'Vials of pharmaceuticals are typically lyophilized in-situ on the shelf',
-          'Lyophilized products have higher moisture content than oven-dried products'
-        ], wrongIndex: 3, explain: 'Backwards. Lyo gives extremely LOW residual moisture (<1%) — that\'s a major reason vaccines are stable. Spray and oven dry to higher residual moisture in many cases.' }
+          'Lyophilized products have HIGHER residual moisture than oven-dried products'
+        ], wrongIndex: 3, explain: 'Backwards. Lyo gives extremely LOW residual moisture (typically <1%) — that\'s the basis of vaccine storage stability over years.' }
     ]
   },
   {
-    id: 'L15', date: 'WK11', name: 'PrOM · DCS & Big Data', questions: [
-      { type: 'mcq', prompt: 'DCS stands for:',
-        options: ['Direct Control Servers', 'Distributed Control System — controllers distributed across a plant, networked via redundant data highways', 'Digital Computing Set', 'Decentralized Sensor Cluster'],
-        correct: 1, explain: 'DCS = the brain of a modern plant. Controllers on the field, operator stations in the control room, redundant networks. Brands: Honeywell Experion, Emerson DeltaV, Yokogawa CENTUM, ABB 800xA.' },
-      { type: 'mcq', prompt: 'The classical automation pyramid (ISA-95) layers, bottom → top, are:',
-        options: ['ERP → MES → SCADA/DCS → Field instruments', 'Field (sensors, valves) → PLC/DCS (control) → SCADA → MES (manufacturing exec) → ERP (enterprise)', 'Cloud → DCS → ERP → Field', 'ERP → MES → ERP → MES'],
+    id: 'L15', date: 'WK11', name: 'PrOM · DCS & Automation', questions: [
+      { type: 'mcq', prompt: 'Manenti opens L15 (slide p.3-4) by quoting Stephanopoulos that a control system satisfies three needs. They are:',
+        options: ['Buy, sell, store', 'Suppress external disturbances, ensure stability, optimize performance — the same triplet Visconti uses in PCI L1!', 'Random goals', 'Just optimization'],
+        correct: 1, explain: 'Slide L15 p.4 (Manenti, quoting Stephanopoulos directly). The two Polimi control courses (Visconti PC&IL Y2S1, Pelucchi DCoCP Y2S2) and the operations-management course (Manenti CP2) all converge on the same control triple — it\'s the textbook spine of process control.' },
+      { type: 'mcq', prompt: 'DCS in a chemical plant context is:',
+        options: ['Direct Cooling System', 'DISTRIBUTED CONTROL SYSTEM — networked controllers distributed across the plant with redundant data highways, operator stations in the control room', 'A type of valve', 'Discrete-time CSTR'],
+        correct: 1, explain: 'DCS = the brain of the plant. Brands: Honeywell Experion, Emerson DeltaV, Yokogawa CENTUM, ABB 800xA. Designed for high availability — redundant controllers + networks.' },
+      { type: 'mcq', prompt: 'The classical AUTOMATION PYRAMID (ISA-95) layers bottom → top:',
+        options: ['ERP → DCS → Field', 'Field (sensors, valves) → PLC/DCS (control) → SCADA → MES (manufacturing execution) → ERP (enterprise resource planning)', 'Cloud first', 'Just two layers'],
         correct: 1, explain: 'Layer 0/1: field. Layer 2: control. Layer 3: MES (scheduling, batch records). Layer 4: ERP (finance, planning). IT/OT convergence is blurring these boundaries today.' },
-      { type: 'mcq', prompt: 'A PROCESS HISTORIAN (PI, Aspen IP.21, etc.) is:',
-        options: ['A safety-critical interlock system', 'A time-series database that archives plant tags (T, P, F, …) for years at high resolution', 'A maintenance log book', 'A control algorithm'],
-        correct: 1, explain: 'Historians enable analytics, troubleshooting, audit. Millions of tags, decades of history. The single most valuable IT asset for many plants — and the foundation of any "big data" project.' },
-      { type: 'mcq', prompt: 'A common BIG DATA / industrial analytics use case in a chemical plant is:',
-        options: ['Posting to social media', 'PREDICTIVE MAINTENANCE — using vibration / temperature trends + ML to flag pump failure days before it happens', 'Replacing the operator', 'Eliminating the DCS'],
-        correct: 1, explain: 'Other classic use cases: soft-sensors (predict slow lab measurements from fast process tags), anomaly detection, golden-batch comparison, energy benchmarking. ML augments — does not replace — DCS.' },
-      { type: 'error', prompt: 'One is FALSE.',
-        statements: [
-          'DCS is designed for high availability with redundant controllers and networks',
-          'SCADA is typically used for geographically distributed assets (pipelines, water networks)',
-          'OPC UA is a modern open standard for industrial data exchange',
-          'A historian writes data only when an operator manually triggers a save'
-        ], wrongIndex: 3, explain: 'Historians write continuously, with deadband / compression algorithms to keep storage manageable. Operators only annotate events.' }
+      { type: 'mcq', prompt: 'A PROCESS HISTORIAN (PI, IP.21):',
+        options: ['Books on plant history', 'A TIME-SERIES DATABASE that archives plant tags (T, P, F, …) for years at high resolution — foundation for analytics, troubleshooting, audit', 'A safety system', 'A control algorithm'],
+        correct: 1, explain: 'Compression algorithms (deadband / swinging-door) keep storage manageable while preserving signal fidelity. Millions of tags + decades of history is typical for major refineries.' },
+      { type: 'mcq', prompt: 'Manenti opens L15 with a definition of "control" — both VERB (to verify by evidence) and NOUN (mechanism to regulate). The point of this etymological frame is:',
+        options: ['Trivial wordplay', 'To anchor the lecture: "controlling" means BOTH observing the truth (measurement) AND acting on it (manipulation) — instrumentation does both', 'Linguistics only', 'Unrelated'],
+        correct: 1, explain: 'Slide L15 p.3 (Manenti). The verb/noun duality maps directly onto sensor (verify) + actuator (regulate). DCS integrates the two.' }
     ]
   },
   {
     id: 'L17', date: 'WK12', name: 'PrOM · Digital Twins', questions: [
-      { type: 'mcq', prompt: 'A DIGITAL TWIN is best defined as:',
-        options: ['A CAD drawing', 'A live, model-based virtual replica of a physical asset/process, synchronized with real plant data', 'A backup of the DCS database', 'Any spreadsheet model'],
-        correct: 1, explain: 'Three ingredients: (1) physics or data-driven model, (2) live plant signals, (3) bidirectional value (predict, recommend, optimize). Without live data sync, it\'s just a model.' },
-      { type: 'mcq', prompt: 'The three classical levels of analytics maturity are:',
-        options: ['Descriptive → Predictive → Prescriptive', 'Reactive → Active → Passive', 'Linear → Quadratic → Cubic', 'Static → Dynamic → Stochastic'],
-        correct: 0, explain: 'Descriptive: what happened (dashboards). Predictive: what will happen (forecasts, soft sensors). Prescriptive: what to DO about it (advisory, closed-loop optimization).' },
+      { type: 'mcq', prompt: 'A DIGITAL TWIN is:',
+        options: ['A CAD drawing', 'A LIVE, model-based virtual replica of a physical asset/process, SYNCHRONIZED with real plant data — bidirectional value (predict, recommend, optimize)', 'A backup of the DCS', 'Any spreadsheet model'],
+        correct: 1, explain: 'Three ingredients: (1) physics or data-driven model, (2) live plant signals, (3) value loop. Without live data sync, it\'s just a model.' },
+      { type: 'mcq', prompt: 'The three classical levels of analytics maturity:',
+        options: ['Reactive → Active → Passive', 'DESCRIPTIVE (what happened) → PREDICTIVE (what will happen) → PRESCRIPTIVE (what to do)', 'Linear → quadratic → cubic', 'Static → dynamic → stochastic'],
+        correct: 1, explain: 'Descriptive: dashboards, historian reports. Predictive: soft sensors, forecasts. Prescriptive: advisory or closed-loop optimization. Maturity grows up the stack.' },
       { type: 'mcq', prompt: 'A typical USE CASE for a unit-operation digital twin:',
         options: ['Replace the operator', 'Operator training (what-if), real-time optimization (setpoint advisory), predictive maintenance, debottlenecking studies', 'Replace the DCS', 'Backup the P&ID'],
-        correct: 1, explain: 'Twin pays back via faster decision-making, fewer surprises, captured plant-knowledge. Best ROI: training + RTO. Worst ROI: trying to replace control with twin "in the loop."' },
+        correct: 1, explain: 'Best ROI: training + RTO. Worst ROI: trying to put the twin in closed-loop control without years of validation.' },
       { type: 'mcq', prompt: 'DATA LAKE vs DATA WAREHOUSE:',
-        options: ['Identical', 'Lake stores raw multi-format data cheaply, schema-on-read; warehouse stores structured, modeled data, schema-on-write', 'Lake is for liquids, warehouse for solids', 'Warehouse is always cheaper'],
-        correct: 1, explain: 'Lake: cheap, flexible, supports ML pipelines. Warehouse: clean, queryable, supports BI. Modern stacks use both ("lakehouse"). Process plants increasingly stream historian data → cloud lake.' },
+        options: ['Identical', 'Lake: raw multi-format data, cheap storage, schema-on-read (ML pipelines). Warehouse: structured, modeled data, schema-on-write (BI). Modern stacks combine both (lakehouse).', 'Lake is for liquids', 'Warehouse is always cheaper'],
+        correct: 1, explain: 'Process plants increasingly stream historian data into cloud lakes for analytics, while keeping a warehouse for KPI reporting and finance.' },
       { type: 'error', prompt: 'One is FALSE.',
         statements: [
-          'A purely data-driven model (no physics) cannot extrapolate safely beyond the training data',
-          'First-principles models (mass/energy balances) generalize better but are slower to build',
+          'A purely data-driven model cannot extrapolate safely beyond its training data',
+          'First-principles models generalize better but are slower to build',
           'Hybrid (physics + ML) models try to combine the strengths of both',
-          'A digital twin requires real-time bidirectional control of the plant'
-        ], wrongIndex: 3, explain: 'A twin needs LIVE DATA in, but does NOT need to write back to the DCS. Most twins are advisory (open loop). Closed-loop twin = RTO (real-time optimization) — a more demanding deployment.' }
+          'A digital twin REQUIRES bidirectional real-time control of the plant'
+        ], wrongIndex: 3, explain: 'A twin needs live data IN but does NOT need to write back to the DCS. Most twins are advisory (open-loop). Closed-loop twin = RTO — a much more demanding deployment with stricter validation requirements.' }
     ]
   },
   {
     id: 'L20', date: 'WK13', name: 'PrOM · Supply Chain', questions: [
-      { type: 'mcq', prompt: 'The BULLWHIP EFFECT in supply chains refers to:',
-        options: ['Order amplification: small variations in downstream demand cause larger swings in upstream production/inventory', 'Whip-like motion of belt conveyors', 'A pneumatic transport phenomenon', 'A safety hazard'],
-        correct: 0, explain: 'Forrester effect. Caused by demand forecasting lags, batch ordering, price fluctuations, rationing. Mitigated by information sharing (vendor-managed inventory) and smaller / faster orders.' },
+      { type: 'mcq', prompt: 'The BULLWHIP effect in supply chains:',
+        options: ['Whip motion of conveyors', 'Demand-signal AMPLIFICATION: small variations in downstream demand cause larger swings in upstream production/inventory', 'A safety hazard', 'A pneumatic phenomenon'],
+        correct: 1, explain: 'Forrester effect. Caused by forecasting lags, batch ordering, price fluctuations. Mitigated by information sharing (VMI), smaller more frequent orders, S&OP alignment.' },
       { type: 'mcq', prompt: 'S&OP (Sales & Operations Planning) is:',
-        options: ['A safety-instrumented function', 'A monthly business process aligning sales forecasts, production plans, inventory targets and finance', 'A specific software', 'A control loop'],
-        correct: 1, explain: 'Bridges marketing (demand) and operations (supply). Without S&OP, sales over-promises and production over- or under-builds. Mature S&OP is a strong predictor of EBITDA.' },
-      { type: 'mcq', prompt: 'JUST-IN-TIME (JIT) production minimizes:',
-        options: ['Capital cost only', 'Inventory at every step — produce what is needed, when it is needed', 'Energy use', 'Number of products'],
-        correct: 1, explain: 'Toyota production system. Demands tight supplier coordination, short setup times, level production. COVID-era stress-tested JIT for chemicals (just-in-CASE inventories are back in vogue).' },
-      { type: 'mcq', prompt: 'The role of ERP (e.g., SAP) in a process plant is to:',
-        options: ['Control the reactor', 'Integrate finance, procurement, inventory, sales, HR; the system of record for transactions', 'Replace the DCS', 'Tune PID loops'],
-        correct: 1, explain: 'ERP = Layer 4. Connects to MES (Layer 3) for production reporting, to suppliers for procurement, to customers for billing. Mis-aligned ERP and MES = bad data, bad decisions.' },
-      { type: 'error', prompt: 'One statement is FALSE.',
+        options: ['A specific software', 'A monthly business process aligning sales forecasts, production plans, inventory targets, and finance', 'A safety function', 'A control loop'],
+        correct: 1, explain: 'Bridges marketing (demand) and operations (supply). Mature S&OP is a strong predictor of EBITDA in process industries.' },
+      { type: 'mcq', prompt: 'JUST-IN-TIME (JIT) production:',
+        options: ['Maximizes inventory', 'Minimizes inventory at every step — produce what is needed, when it is needed; tight supplier coordination, short setup times, level production', 'Random ordering', 'Slow production'],
+        correct: 1, explain: 'Toyota production system. COVID-era stress-tested JIT (especially for chemicals); "just-in-CASE" inventories are back in vogue.' },
+      { type: 'mcq', prompt: 'ERP (e.g., SAP) role in a process plant:',
+        options: ['Control the reactor', 'Integrate finance, procurement, inventory, sales, HR — the system of record for transactions, connects to MES upward and suppliers/customers outward', 'Replace DCS', 'Tune PIDs'],
+        correct: 1, explain: 'Layer 4 of ISA-95. Mis-aligned ERP and MES = bad data, bad decisions. The two must talk reliably for any of the digital-twin / analytics layer to add value.' },
+      { type: 'error', prompt: 'One is FALSE.',
         statements: [
-          'Scheduling in process plants must respect campaign sequences and changeover times',
-          'A higher safety stock decreases the risk of stockout but increases working capital',
-          'MTS (Make-to-Stock) is preferred for high-volume, low-variation commodities',
-          'MTO (Make-to-Order) eliminates the need for any production planning'
-        ], wrongIndex: 3, explain: 'MTO still needs careful capacity planning, raw-material lead times, and finite scheduling. MTO eliminates FINISHED inventory, not planning.' }
+          'Process plant scheduling must respect campaign sequences and changeover times',
+          'Higher safety stock reduces stockout risk but increases working capital',
+          'MTS (Make-to-Stock) preferred for high-volume, low-variation commodities',
+          'MTO (Make-to-Order) eliminates the need for production planning'
+        ], wrongIndex: 3, explain: 'MTO still needs capacity planning, raw-material lead times, and finite scheduling. MTO eliminates FINISHED inventory, not planning.' }
     ]
   },
   {
     id: 'L91', date: 'WK14', name: 'CO2 Utilization & Biorefineries', questions: [
       { type: 'mcq', prompt: 'CCS vs CCU distinction:',
-        options: ['Same thing', 'CCS (Carbon Capture & STORAGE): permanently sequester CO2 underground. CCU (UTILIZATION): convert CO2 into chemicals, fuels, materials', 'CCU is illegal', 'CCS uses biology, CCU uses chemistry'],
-        correct: 1, explain: 'CCS = geological. CCU = product. CCS is needed at scale; CCU adds optionality (especially urea, methanol, mineralization, polymers). CCU alone cannot close the carbon balance.' },
-      { type: 'mcq', prompt: 'The MAIN challenge of using CO2 as a chemical feedstock is:',
-        options: ['CO2 is too rare', 'CO2 is the LOWEST-energy form of carbon; reducing it requires H2 (ideally green) and significant energy input', 'It freezes too easily', 'Safety regulations'],
-        correct: 1, explain: 'Thermodynamics dictates the cost. Cheap green H2 is the rate-limiting step for CO2-to-X. Same energy bottleneck as the broader hydrogen economy.' },
+        options: ['Same', 'CCS = Carbon Capture & STORAGE (permanent geological sequestration). CCU = UTILIZATION — convert CO2 into chemicals, fuels, materials.', 'CCU is illegal', 'CCS uses biology only'],
+        correct: 1, explain: 'CCS = geological scale. CCU adds optionality (urea, methanol, mineralization, polymers). CCU alone cannot close the carbon balance at industrial scale.' },
+      { type: 'mcq', prompt: 'Main CHEMICAL challenge of using CO2 as a feedstock:',
+        options: ['CO2 is too rare', 'CO2 is the LOWEST-energy form of carbon → reducing it requires H2 (ideally green) and significant energy input; thermodynamics drives the cost', 'It freezes too easily', 'Safety only'],
+        correct: 1, explain: 'Cheap green H2 is the rate-limiting step. CO2-to-X economics track the price of clean hydrogen.' },
       { type: 'mcq', prompt: 'Biorefinery generation classification:',
-        options: ['1G/2G/3G has no meaning', '1G = food crops (corn, sugar); 2G = lignocellulosic (straw, wood); 3G = algae and other non-conventional', '1G is the most modern', 'Generations refer to plant size'],
-        correct: 1, explain: '1G: easy chemistry, food-vs-fuel issues. 2G: harder (lignin is tough), no food competition. 3G: algae — high potential, scale and harvest economics still unresolved.' },
-      { type: 'mcq', prompt: 'Lignocellulose has THREE main biopolymer fractions:',
-        options: ['Starch, sugar, protein', 'Cellulose, hemicellulose, lignin', 'Cellulose, lipid, lignin', 'Glucose, fructose, sucrose'],
-        correct: 1, explain: 'Cellulose (β-1,4 glucose, crystalline, ~40%). Hemicellulose (mixed C5/C6 sugars, ~25%). Lignin (aromatic polymer, ~25%). Each needs its own conversion strategy.' },
+        options: ['No meaning', '1G = food crops (corn, sugar) → food-vs-fuel debate. 2G = lignocellulosic (straw, wood) — no food competition, harder chemistry. 3G = algae and other non-conventional', 'Random', 'Plant size'],
+        correct: 1, explain: '1G is mature but politically controversial. 2G technology is maturing (cellulosic ethanol, 5-HMF). 3G algae has potential but harvest/scale economics still uncertain.' },
+      { type: 'mcq', prompt: 'LIGNOCELLULOSE has three biopolymer fractions:',
+        options: ['Starch, sugar, protein', 'Cellulose (β-1,4-glucose, crystalline, ~40%), Hemicellulose (mixed C5/C6 sugars, ~25%), Lignin (aromatic polymer, ~25%)', 'Cellulose, lipid, lignin', 'Glucose, fructose, sucrose'],
+        correct: 1, explain: 'Each fraction needs its own conversion strategy. Lignin valorization is the open frontier — converting it into aromatics could unlock the 2G economics.' },
       { type: 'mcq', prompt: 'FAME vs HVO biodiesel:',
-        options: ['Identical', 'FAME = Fatty Acid Methyl Ester (transesterification, oxygenated); HVO = Hydrotreated Vegetable Oil (deoxygenation with H2, drop-in diesel)', 'HVO is the older technology', 'FAME has higher cetane'],
-        correct: 1, explain: 'FAME: simple, but bad cold flow, oxidative instability, max ~7% blend. HVO: chemically identical to fossil diesel, drop-in, expensive H2 needs — the modern premium biofuel.' }
+        options: ['Identical', 'FAME = Fatty Acid Methyl Ester (transesterification, oxygenated, max ~7% blend). HVO = Hydrotreated Vegetable Oil (deoxygenation with H2, drop-in diesel, premium product).', 'HVO is older', 'FAME has higher cetane'],
+        correct: 1, explain: 'FAME has bad cold-flow and oxidative-stability issues. HVO is chemically identical to fossil diesel → drop-in fuel. HVO economics are limited by green H2 cost.' }
     ]
   }
 ];
 
-// Boss round: shuffled mix + a few exclusive integrative questions
+// Boss round: integrative cross-lecture questions
 const BOSS_EXCLUSIVE = [
-  { type: 'mcq', prompt: 'A plant manager asks: "I want to cut my steam bill by 30% next year." What is the FIRST tool you reach for?',
-    options: ['Replace the DCS', 'Pinch analysis of the existing network — target the MER before designing any new HX', 'Install solar panels on the roof', 'Hire more operators'],
-    correct: 1, explain: 'Always TARGET before you DESIGN. Pinch tells you the thermodynamic minimum utility — anything you do should approach that target. Random heat-integration moves often underperform pinch.' },
-  { type: 'mcq', prompt: 'You are sizing a cooling tower for a tropical site with high wet-bulb (T_wb = 28°C). Your process requires cooling water at 30°C. The approach you must design for is:',
-    options: ['Very large (≈10°C, generous)', 'Very small (≈2°C) — likely uneconomic; consider air coolers or a different process', 'Negative', 'Set by dry-bulb only'],
-    correct: 1, explain: 'Approach = 30 − 28 = 2°C. A 2°C approach is brutal (huge tower, lots of fans). High T_wb sites usually combine air cooling + cooling tower or use chillers for the last few degrees.' },
-  { type: 'mcq', prompt: 'A pharma plant produces a heat-sensitive antibiotic. Which drying technique is the CORRECT choice?',
-    options: ['Direct-fired rotary kiln', 'Lyophilization (freeze drying) — preserves activity at the cost of cycle time and energy', 'Spray drying with inlet air at 350°C', 'Tray drying in atmospheric air at 150°C'],
-    correct: 1, explain: 'Antibiotics, vaccines, plasma — anything that denatures above ~40-60°C — go to lyo, period. Spray drying CAN work for some pharma but inlet T must be moderated and outlet T set carefully.' },
-  { type: 'numeric', prompt: 'A heat pump replaces an electric resistance heater. Resistance heater: COP = 1. Heat pump: COP_h = 4. If the heat demand is 100 kW continuous and electricity is €100/MWh, annual electricity savings? (€/year, assume 8000 h/year operation)',
-    answer: 60000, tolerance: 1000, units: '€/year',
-    explain: 'Resistance: 100 kW × 8000 h = 800 MWh × €100 = €80,000. Heat pump at COP 4: 100/4 = 25 kW × 8000 h = 200 MWh × €100 = €20,000. Savings = €60,000/year. Payback typically 3-7 yr.' },
-  { type: 'mcq', prompt: 'A digital twin of a distillation column is providing operator advisory setpoints. Suddenly it diverges from the real plant. The MOST LIKELY cause is:',
-    options: ['Operator error', 'Model-mismatch from an unmeasured feed composition change, instrument drift, or a missing fouling term', 'The twin has been hacked', 'The DCS is broken'],
-    correct: 1, explain: 'Twins drift. Causes: unmeasured disturbance, sensor drift, kinetic / thermal degradation, fouling, control changes. Twin must include continuous re-tuning (parameter estimation) to stay valid.' }
+  { type: 'mcq', prompt: 'A plant manager wants to cut his steam bill by 30%. Per Manenti\'s methodology, what is your FIRST tool?',
+    options: ['Replace the DCS', 'PINCH analysis of the existing network — TARGET the MER (Minimum Energy Requirement) before designing any new HEs', 'Solar panels', 'Hire more operators'],
+    correct: 1, explain: 'Always TARGET before you DESIGN. Pinch reveals the thermodynamic minimum utility consumption — anything you design should approach that target. Random heat-integration moves typically underperform a pinch-guided retrofit.' },
+  { type: 'mcq', prompt: 'A pharma plant needs to dry a heat-sensitive antibiotic. Per Manenti\'s lectures, the correct choice is:',
+    options: ['Direct-fired rotary kiln', 'LYOPHILIZATION (freeze-drying) — preserves activity at the cost of cycle time and energy', 'Spray drying at 350°C inlet', 'Tray drying at 150°C'],
+    correct: 1, explain: 'Anything that denatures above ~40-60°C goes to lyo. The economics work because the product value is much higher than the energy cost.' },
+  { type: 'mcq', prompt: 'You replace an electric resistance heater (COP=1) with a heat pump (COP_h=4). Per Manenti L7, annual savings at 100 kW continuous load, 8000 h/y, €100/MWh electricity:',
+    options: ['€10,000/year', '€60,000/year (80 MWh×€100 vs 200 MWh×€100 = 80k vs 20k → 60k saved)', '€100,000/year', '€500,000/year'],
+    correct: 1, explain: 'Resistance: 100·8000 = 800 MWh × €100 = €80k. Heat pump: 100/4 = 25 kW input × 8000 = 200 MWh × €100 = €20k. Savings = €60k/year. Typical payback 3-7 years.' },
+  { type: 'mcq', prompt: 'A new digital twin of a distillation column starts diverging from the real plant. Most likely cause:',
+    options: ['Operator error', 'MODEL MISMATCH — unmeasured feed composition change, instrument drift, fouling term degraded; requires continuous parameter estimation to stay valid', 'Twin was hacked', 'DCS is broken'],
+    correct: 1, explain: 'Twins drift. Causes: unmeasured disturbance, sensor drift, fouling, control changes. A twin must include continuous re-tuning (parameter estimation, data reconciliation) to remain trustworthy.' },
+  { type: 'mcq', prompt: 'Manenti positions CP2 within the chemical engineering curriculum. The course covers BOTH:',
+    options: ['Just unit ops', 'UNIT OPERATIONS (HE, pinch, dryers, etc.) AND Process Operations Management (DCS, digital twins, supply chain, sustainability) — bridging plant engineering with operations management', 'Just business', 'Just safety'],
+    correct: 1, explain: 'The structure is intentional: traditional unit ops grounded in the modern PrOM context (digital twin, supply chain, CO2 utilization, biorefineries). Bridges Y2 ChemE with the industry\'s digital + sustainability transition.' }
 ];
 
 // ============================================================
