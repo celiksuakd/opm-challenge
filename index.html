@@ -717,144 +717,136 @@ const ROOMS = [
     ]
   },
   {
-    id: "L92", date: "WK15", name: "CPPOM2 · Heat Exchangers (design)", questions: [
-      { type: "mcq", prompt: "Typical overall heat-transfer coefficient U (W·m⁻²·K⁻¹) is LOWEST for which duty?",
-        options: ["Gas–gas (≈ 200)", "Gas–liquid (≈ 400)", "Liquid–liquid (≈ 600)", "Boiling liquid (≈ 1000)"],
-        correct: 0, explain: "Gas–gas has the worst film coefficients → U ≈ 200. It climbs through gas–liq (≈400) and liq–liq (≈600) up to boiling/condensing (≈1000). U is THE key sizing parameter (Q = U·A·ΔT_lm)." },
-      { type: "mcq", prompt: "To RAISE the tube-side velocity (hence h and ΔP) WITHOUT changing the total number of tubes, you:",
-        options: ["increase the number of passes (fewer tubes per pass, smaller bore)", "decrease the number of passes", "increase the tube diameter", "increase the shell diameter"],
-        correct: 0, explain: "More passes packs the same tubes into fewer-per-pass, raising velocity → higher h and higher ΔP. The classic exam move: ↑passes, ↓tubes-per-pass, ↓diameter, total tube count fixed." },
-      { type: "mcq", prompt: "If a stream is dirty/fouling and that side must be cleaned often, you route it:",
-        options: ["through the TUBES (far easier to clean than the shell)", "through the SHELL", "through the gaskets", "around the baffles"],
-        correct: 0, explain: "Tube-side is mechanically cleanable; shell-side fouling is a nightmare. Put the fouling fluid in the tubes (and worry about ΔP there)." },
-      { type: "mcq", prompt: "Heat-exchanger SIZING is driven by the energy balance and Q = U·A·ΔT_lm. The usual design unknown is:",
-        options: ["the area A (→ size / number of tubes)", "the fluid densities", "the ambient temperature", "the pump characteristic curve"],
-        correct: 0, explain: "Given the duty Q, the temperatures (ΔT_lm) and U, you solve for the area A — then translate it into tube count, length and shell size." },
-      { type: "error", prompt: "One statement about heat exchangers is FALSE.",
-        statements: [
-          "Shell-and-tube units are robust and handle high pressure",
-          "U is higher for boiling/condensing than for gas–gas duty",
-          "Adding tube passes raises the tube-side velocity and ΔP",
-          "The optimum of the whole plant always equals the optimum of each single unit"
-        ], wrongIndex: 3, explain: "Saldarini states it explicitly: the plant optimum is NOT the sum of single-unit optima. You optimise the SYSTEM (e.g. via pinch), not each exchanger in isolation." }
+    id: "L92", date: "WK15", name: "CPPOM2 · Heat Exchangers", questions: [
+      { type: "mcq", prompt: "Which heat exchanger would you use for a gas cycle (gas/gas duty), and why?",
+        options: ["Finned-tube (extended surface) — the fins add gas-side area to offset the very low gas film coefficient", "Bare-tube unit — the gas film coefficient is already high", "Plate-and-frame — ideal for gas/gas service", "Spiral exchanger — to raise the gas density"],
+        correct: 0, explain: "In a gas cycle the controlling resistance is the very low gas-side coefficient (tens of W/m²K). Extended (finned) surfaces raise the effective UA by adding area, since you can't easily raise the coefficient itself." },
+      { type: "mcq", prompt: "In a shell-and-tube exchanger, do baffles DECREASE the shell-side velocity?",
+        options: ["No — baffles promote cross-flow and RAISE the shell-side velocity/turbulence (better h, higher ΔP)", "Yes — they slow the shell-side fluid down", "No — they have no effect on velocity", "Yes — they only support the tubes mechanically"],
+        correct: 0, explain: "Baffles are installed precisely to force cross-flow and raise the average shell-side velocity and turbulence, improving the shell-side heat-transfer coefficient — at the cost of higher pressure drop." },
+      { type: "mcq", prompt: "When should a TRIANGULAR tube pitch be avoided?",
+        options: ["When low shell-side ΔP and mechanical cleaning are needed (fouling) → use a square pitch", "When maximum compactness is required", "Always — triangular pitch is never used", "Only for liquid/liquid duty"],
+        correct: 0, explain: "Triangular pitch gives higher shell-side ΔP and leaves no straight cleaning lanes. In fouling service needing mechanical cleaning, a square pitch (lower ΔP, cleanable) is preferred." },
+      { type: "mcq", prompt: "How many tube-side passes does a 1-2 shell-and-tube heat exchanger have?",
+        options: ["Two (one shell pass, two tube passes)", "One", "Four", "Six"],
+        correct: 0, explain: "A 1-2 exchanger = one shell-side pass and two tube-side passes (the tube fluid is fed and returns: parallel flow in the first pass, counter-flow in the second)." },
+      { type: "mcq", prompt: "How is differential THERMAL EXPANSION handled in a shell-and-tube exchanger?",
+        options: ["Floating-head construction (one tube sheet free to move) — or shell expansion bellows", "Weld both tube sheets rigidly to the shell", "Increase the shell wall thickness only", "Remove the baffles"],
+        correct: 0, explain: "A floating head lets one tube sheet move relative to the shell, absorbing the differential expansion between tubes and shell; expansion bellows on the shell are an equivalent remedy." }
     ]
   },
   {
-    id: "L93", date: "WK16", name: "CPPOM2 · Heat Pumps & COP", questions: [
-      { type: "mcq", prompt: "The coefficient of performance of a HEATING heat pump is:",
-        options: ["COP = Q₂ / W  (heat delivered / work input)", "COP = W / Q₂", "COP = Q₁ / Q₂", "COP = W / Q₁"],
-        correct: 0, explain: "COP = useful heat delivered to the hot side / work spent = Q₂/W. It is > 1 (you move more heat than the work you pay), unlike a resistance heater (COP = 1)." },
-      { type: "mcq", prompt: "Using W = Q₂ − Q₁, the COP can be rewritten as:",
-        options: ["COP = 1 / (1 − Q₁/Q₂)", "COP = 1 / (1 + Q₁/Q₂)", "COP = 1 − Q₁/Q₂", "COP = Q₁/Q₂ − 1"],
-        correct: 0, explain: "COP = Q₂/W = Q₂/(Q₂−Q₁) = 1/(1 − Q₁/Q₂). If the heat that must be 'upgraded' (Q₂) is closer to Q₁, the COP rises." },
-      { type: "numeric", prompt: "A heat pump delivers Q₂ = 300 kW to the hot side while drawing Q₁ = 200 kW from the cold side. Compute COP = Q₂/(Q₂ − Q₁).",
-        answer: 3, tolerance: 0.05, units: "(dimensionless)",
-        explain: "W = Q₂ − Q₁ = 300 − 200 = 100 kW; COP = 300/100 = 3. Three units of heat delivered per unit of work — a resistance heater would give 1." },
-      { type: "mcq", prompt: "The (reverse) Carnot cycle is made of:",
-        options: ["two isothermal + two isentropic (reversible adiabatic) steps", "two isobaric + two isochoric steps", "two isothermal + two isobaric steps", "four isentropic steps"],
-        correct: 0, explain: "Carnot = two isothermal heat-exchange steps + two isentropic compression/expansion steps. It is the reversible ideal — real cycles fall short because reversibility is impossible." },
-      { type: "mcq", prompt: "A HIGHER COP means:",
-        options: ["more heat delivered per unit of work input (more efficient)", "more work needed per unit of heat", "the cycle has become irreversible", "the cold reservoir is hotter than the hot one"],
-        correct: 0, explain: "High COP = a lot of heat moved for little work. That is why a COP-4 heat pump replacing a COP-1 resistance heater cuts the electricity bill ~4×." }
+    id: "L93", date: "WK16", name: "CPPOM2 · Heat Pumps & Vapour Cycle", questions: [
+      { type: "mcq", prompt: "In the vapour-compression cycle, the lamination (expansion) valve performs:",
+        options: ["Isenthalpic expansion to the low pressure (no mechanical-work recovery)", "Isentropic expansion with work recovery", "Isothermal compression", "Constant-pressure heating"],
+        correct: 0, explain: "The valve drops the pressure at constant enthalpy (isenthalpic); isothermal expansion would be ideal but is impractical, so a simple throttling valve is used with no work recovered." },
+      { type: "mcq", prompt: "On a T-s diagram, the ideal Carnot cycle is:",
+        options: ["A rectangle — two isothermals + two isentropics (reversible)", "A triangle — two isobars and one isotherm", "A circle", "Two isochors + two isobars"],
+        correct: 0, explain: "Two isothermal heat-exchange steps (at T_hot, T_cold) and two isentropic (reversible adiabatic) compression/expansion steps form a rectangle — the maximum-efficiency benchmark between the two temperatures." },
+      { type: "mcq", prompt: "For a Carnot refrigeration / heat-pump cycle, the COP has the form:",
+        options: ["COP = 1 / (T₂/T₁ − 1)", "COP = T₂/T₁ − 1", "COP = 1 − T₁/T₂", "COP = T₁/T₂"],
+        correct: 0, explain: "The reversible Carnot COP depends only on the two absolute temperatures: COP = 1/(T₂/T₁ − 1). Real cycles fall short because the isothermal steps are impractical." },
+      { type: "mcq", prompt: "The liquid leaving a heat-pump CONDENSER is kept:",
+        options: ["Slightly sub-cooled — so the line pressure drop does not cause flashing before the valve", "As a superheated vapour", "As a two-phase mixture", "Exactly at the critical point"],
+        correct: 0, explain: "A few degrees of sub-cooling prevents partial vaporization in the line to the lamination valve (which would raise the vapour fraction after the valve and cut the evaporator duty). The valve is also kept close to the evaporator." },
+      { type: "mcq", prompt: "Why are long tubes used in the evaporator section (between the lamination valve and the compressor)?",
+        options: ["To fully vaporize and slightly superheat the refrigerant — so no liquid droplets reach the compressor", "To cool the refrigerant before compression", "To raise the condenser pressure", "To recover expansion work"],
+        correct: 0, explain: "Enough heat-exchange length guarantees complete vaporization plus a little superheat, protecting the compressor from liquid. The trade-off is a higher pressure drop / larger specific volume." }
     ]
   },
   {
-    id: "L94", date: "WK17", name: "CPPOM2 · Cooling Towers & Psychrometry", questions: [
-      { type: "mcq", prompt: "Absolute humidity is defined as the:",
-        options: ["mass of water vapour per mass of DRY gas", "mass of vapour per mass of WET gas", "moles of vapour per mole of liquid", "volume of vapour per volume of air"],
-        correct: 0, explain: "Humidity Hu = (mass vapour)/(mass dry gas). Referencing the DRY gas keeps it constant as vapour is added/removed — the basis psychrometric charts use." },
-      { type: "mcq", prompt: "In Hu = (MW_A·P_A)/(MW_B·(1 − P_A)), the molar masses MW_A and MW_B belong to:",
-        options: ["water vapour (A) and dry air (B)", "dry air (A) and water (B)", "the solute (A) and the solvent (B)", "the liquid (A) and its vapour (B)"],
-        correct: 0, explain: "A = water (the condensable), B = dry air (the carrier). P_A is water's partial pressure / total; the ratio of molar masses converts the mole ratio into a mass ratio." },
-      { type: "mcq", prompt: "The WET-BULB temperature is:",
-        options: ["the temperature air reaches by evaporative cooling until it is 100% saturated", "the temperature at which the gas fully condenses", "the boiling point of the liquid", "the adiabatic flame temperature"],
-        correct: 0, explain: "Water evaporating into unsaturated air cools it; the limit, when the air is fully saturated, is the wet-bulb temperature — the key driving-force reference for cooling towers." },
-      { type: "mcq", prompt: "The DEW POINT is the temperature at which:",
-        options: ["the air becomes saturated and condensation begins (P_water = P_sat)", "the air reaches exactly 50% humidity", "all the water has evaporated", "the wet-bulb equals the dry-bulb at 0% humidity"],
-        correct: 0, explain: "Cool humid air and at the dew point its water partial pressure equals the saturation pressure → droplets form. Below it you lose water by condensation." },
-      { type: "mcq", prompt: "Since humidity depends only on the water partial pressure, knowing the temperature T is enough to find it because:",
-        options: ["T fixes the saturation vapour pressure (Antoine), hence the partial pressure and Hu", "T fixes only the air density", "humidity is independent of T", "you also need the wind speed"],
-        correct: 0, explain: "Treating humidity as a property of air alone: T → P_sat (Antoine's equation) → partial pressure → Hu. That is why a single T reading places you on the psychrometric chart." }
+    id: "L94", date: "WK17", name: "CPPOM2 · Gas-Solid Separators", questions: [
+      { type: "mcq", prompt: "Which assumptions are used to estimate the CRITICAL particle diameter in a settling (abatement) chamber?",
+        options: ["Buoyancy neglected, Stokes drag (C = 24/Re), worst-case particle entering at the top; removed if t_fall ≤ t_residence", "Buoyancy dominant, turbulent drag, particle entering at the bottom", "The particle is removed only if t_fall > t_residence", "Settling velocity is independent of particle diameter"],
+        correct: 0, explain: "Stokes settling v_s = ρ_s·d_p²·g/(18µ); buoyancy is negligible (solid ≈1000 vs gas ≈1 kg/m³). The worst-case particle enters at the top and is captured if its fall time H/v_s is shorter than the gas residence time L/v_conv." },
+      { type: "mcq", prompt: "An abatement (settling) chamber versus an electrostatic precipitator (ESP):",
+        options: ["Chamber = gravity (coarse particles); ESP = electric field on charged particles (very fine, low ΔP, high CapEx)", "Chamber = electric field; ESP = gravity", "Both use centrifugal force", "Both capture only coarse particles"],
+        correct: 0, explain: "The chamber separates by the density/gravity difference (coarse particles, efficiency rises with cross-section and length). The ESP charges particles and collects them on electrodes — much finer capture, low pressure drop, but high capital cost." },
+      { type: "mcq", prompt: "Stacking a settling chamber into N horizontal layers (multi-layer chamber), the critical diameter scales as:",
+        options: ["D_p ∝ 1/√N", "D_p ∝ N", "D_p ∝ 1/N²", "D_p ∝ √N"],
+        correct: 0, explain: "Multi-layer stacking is the strongest intensification: the capturable critical diameter shrinks as 1/√N. The limit is the minimum single-layer height that still satisfies the boundary-layer condition." },
+      { type: "mcq", prompt: "A cyclone separates particles by:",
+        options: ["Centrifugal force — the gas spirals and particles are thrown to the wall (finer cut than a chamber, high ΔP)", "Gravity settling only", "An electric field on the particles", "A filter septum"],
+        correct: 0, explain: "The gas follows a helicoidal path; centrifugal force throws particles to the wall. A cyclone captures much smaller particles than a settling chamber and is compact/vertical, but gives a high pressure drop (compression cost)." },
+      { type: "mcq", prompt: "A gas-solid separator is ALWAYS required downstream of:",
+        options: ["Fluidized-bed / entrained-flow reactors, solid-fuel combustors and spray dryers", "Liquid-liquid extractors and distillation columns", "Plate heat exchangers and pumps", "Cooling towers only"],
+        correct: 0, explain: "To keep the gas pure/single-phase (entrained solids damage turbines, pumps, compressors and clog beds), prevent catalyst loss, abate particulate from combustion, and recover the dried product from spray dryers." }
     ]
   },
   {
-    id: "L95", date: "WK18", name: "CPPOM2 · Evaporators (steam economy)", questions: [
-      { type: "mcq", prompt: "The STEAM ECONOMY of an evaporator is:",
-        options: ["kg of water evaporated per kg of steam supplied", "kg of steam per kg of water evaporated", "kg of product per kg of feed", "kW of duty per kg of steam"],
-        correct: 0, explain: "Steam economy = (water evaporated)/(steam used). A single effect gives ≈ 0.8–0.9; you raise it by reusing each effect's vapour as the next effect's heating steam." },
-      { type: "numeric", prompt: "A multiple-effect evaporator reuses each effect's vapour as the next effect's steam, so the steam economy ≈ the number of effects. Estimate it for a TRIPLE-effect unit.",
-        answer: 3, tolerance: 0.5, units: "kg/kg",
-        explain: "≈ 3 kg water evaporated per kg of live steam (one kg of steam is reused across the three effects). That OPEX saving is the whole point of multi-effect." },
-      { type: "mcq", prompt: "Boiling-point ELEVATION (BPE) is:",
-        options: ["the rise in a solution's boiling point above the pure solvent (dissolved solute)", "the drop in boiling point under vacuum", "the rise in condenser pressure", "the superheat of the heating steam"],
-        correct: 0, explain: "Dissolved solute lowers the solvent's vapour pressure → the solution boils hotter than pure solvent. BPE eats into the available ΔT between effects, so it must be accounted for." },
-      { type: "mcq", prompt: "Moving concentrated liquor from a low-pressure effect toward a HIGHER-pressure (earlier) effect (backward feed) requires:",
-        options: ["a pump — it cannot flow against the pressure gradient on its own", "no pump — the vapour carries it", "gravity alone", "a turbine"],
-        correct: 0, explain: "Forward feed flows naturally high→low pressure; backward feed must PUMP the thick liquor up the pressure gradient. That extra pumping is the trade-off for backward feed's thermal advantage." },
-      { type: "mcq", prompt: "Adding more EFFECTS to an evaporator train:",
-        options: ["raises CAPEX (more vessels) but lowers OPEX (less steam per kg water)", "lowers both CAPEX and OPEX", "raises both CAPEX and OPEX", "has no effect on steam consumption"],
-        correct: 0, explain: "Each extra effect is another vessel (capital) but cuts the live-steam demand (operating cost). The optimum number of effects balances the two." }
+    id: "L95", date: "WK18", name: "CPPOM2 · Evaporators & Cooling Towers", questions: [
+      { type: "mcq", prompt: "In a co-current (forward-feed) multi-effect evaporator, along the liquid path the pressure:",
+        options: ["Decreases progressively (1st → last effect) — so the liquor flows by the pressure difference alone", "Increases progressively from first to last", "Stays constant in every effect", "Oscillates effect to effect"],
+        correct: 0, explain: "Effects are numbered by decreasing pressure and each effect's vapour heats the next; the liquor flows the same way as the vapour, driven by the ΔP, so only one feed pump and one thick-liquor pump are needed." },
+      { type: "mcq", prompt: "Increasing the number of EFFECTS of an evaporator:",
+        options: ["Raises steam economy → lowers OpEx, but CapEx is about N× a single effect", "Lowers both OpEx and CapEx", "Raises OpEx and lowers CapEx", "Has no effect on steam consumption"],
+        correct: 0, explain: "More effects ⇒ more kg evaporated per kg of live steam (higher steam economy) ⇒ lower operating cost; but each effect is another vessel. The optimum N balances steam saving against investment." },
+      { type: "mcq", prompt: "Does a long-tube (calandria) evaporator need a recirculation PUMP?",
+        options: ["No — it circulates naturally (thermosyphon); only a forced-circulation unit needs a pump", "Yes — always a recirculation pump", "Yes — a vacuum pump drives the circulation", "No pump of any kind is ever present"],
+        correct: 0, explain: "The long-tube vertical evaporator is a natural-circulation calandria: boiling creates a density difference that lifts the liquid. Only forced-circulation units need a pump (feed and thick-liquor pumps may still exist)." },
+      { type: "mcq", prompt: "In a cooling tower, the water loss in the liquid (aqueous) phase is:",
+        options: ["Small — ≈2% by evaporation + ≈0.2% drift; compensated by make-up plus a purge", "Negligible — exactly zero", "Very large — about 50%", "Equal to the air flow rate"],
+        correct: 0, explain: "The enthalpy balance assumes ~2% evaporative loss; drift adds ~0.2%. It isn't zero, so make-up water is added and a purge prevents salt accumulation." },
+      { type: "mcq", prompt: "When the WET-BULB and DRY-BULB temperatures are EQUAL, the gas is:",
+        options: ["Saturated (100% relative humidity) — no driving force for evaporation", "Completely dry (0% humidity)", "Exactly at its dew point only", "Superheated"],
+        correct: 0, explain: "The wet-bulb is the temperature reached by evaporative cooling; when it equals the dry-bulb there is no further evaporation, i.e. the gas is fully saturated. (Water can never be cooled below the wet-bulb.)" }
     ]
   },
   {
-    id: "L96", date: "WK19", name: "CPPOM2 · Crystallization Kinetics", questions: [
-      { type: "mcq", prompt: "To crystallize NaCl (whose solubility barely changes with temperature), the preferred route is:",
-        options: ["EVAPORATIVE crystallization (cooling is ineffective; salting-out is a last resort)", "cooling crystallization", "anti-solvent (salting-out) as the first choice", "sublimation"],
-        correct: 0, explain: "Flat solubility ⇒ cooling removes almost no NaCl. You evaporate water to drive supersaturation. Anti-solvent/precipitation is only used if evaporation fails." },
-      { type: "mcq", prompt: "Homogeneous vs heterogeneous nucleation:",
-        options: ["homogeneous = spontaneous/primary in the bulk; heterogeneous = on a surface or seed (secondary) — the industrial norm", "homogeneous = on a surface; heterogeneous = in the bulk", "both occur only on cooling", "they are the same thing"],
-        correct: 0, explain: "Homogeneous needs high supersaturation and happens suddenly in the bulk; heterogeneous nucleates on surfaces/seeds at lower driving force and is what industrial crystallizers exploit (seeding)." },
-      { type: "numeric", prompt: "By the ΔL law (invariant-crystal / McCabe), crystal size grows as ΔL = G·Δt. With growth rate G = 3 µm/min over Δt = 60 min, compute ΔL.",
-        answer: 180, tolerance: 2, units: "µm",
-        explain: "ΔL = G·Δt = 3 × 60 = 180 µm — comfortably inside the typical 50–500 µm product range. G is set by supersaturation; t by residence time." },
-      { type: "mcq", prompt: "Ostwald ripening is the phenomenon where:",
-        options: ["large crystals grow at the expense of small ones (small ones redissolve)", "small crystals grow faster than large ones", "all crystals shrink uniformly", "new crystals nucleate continuously"],
-        correct: 0, explain: "Small crystals have higher solubility (Gibbs–Thomson) → they dissolve and feed the big ones. It coarsens the PSD over time — sometimes wanted, sometimes not." },
-      { type: "mcq", prompt: "The driving force for both nucleation and crystal growth is:",
-        options: ["supersaturation — concentration above the saturation solubility", "subcooling below the freezing point only", "the boiling-point elevation", "the pressure drop across the crystallizer"],
-        correct: 0, explain: "No supersaturation, no crystallization. You create it by cooling, evaporating or adding anti-solvent; controlling it controls the balance of nucleation vs growth (and thus the PSD)." }
+    id: "L96", date: "WK19", name: "CPPOM2 · Crystallization", questions: [
+      { type: "mcq", prompt: "The ΔL law of crystal growth states:",
+        options: ["ΔL = G·Δt — every crystal grows by the same length increment (G independent of size; valid ≈50–500 µm)", "ΔL = G/Δt", "the growth rate is proportional to the crystal size", "ΔL = G·Δt only above 500 µm"],
+        correct: 0, explain: "For invariant crystals with no Ostwald ripening, all crystals grow by the same ΔL = G·Δt; the linear growth rate G does not depend on size. Outside ~50–500 µm the growth becomes size-dependent and the law fails." },
+      { type: "mcq", prompt: "Are LARGE crystals typical of LARGE supersaturation (homogeneous crystallization)?",
+        options: ["No — high supersaturation gives many SMALL crystals; large crystals form at LOW supersaturation (near equilibrium)", "Yes — high supersaturation gives large crystals", "Supersaturation has no effect on size", "Only temperature sets the crystal size"],
+        correct: 0, explain: "From the Kelvin equation, high supersaturation drives abundant nucleation → many small crystals; large crystals are obtained close to equilibrium (low supersaturation)." },
+      { type: "mcq", prompt: "How is MgSO₄ (solubility INCREASES with temperature, 'type 1') crystallized?",
+        options: ["By cooling a warm saturated solution — in practice adiabatic (vacuum) evaporative cooling", "By evaporation only ('type 2' behaviour)", "By heating the solution", "By adding more solvent"],
+        correct: 0, explain: "Type-1 solubility rises with T, so cooling a warm saturated solution generates the supersaturation; adiabatic vacuum cooling combines cooling with partial solvent evaporation and lands in the right hydrate region." },
+      { type: "mcq", prompt: "A MORE VISCOUS crystallizing solution:",
+        options: ["Lengthens the time to reach equilibrium (slower mass transfer to the crystal faces; crystals settle)", "Shortens it (faster diffusion)", "Has no effect on equilibration time", "Prevents crystallization entirely"],
+        correct: 0, explain: "Higher viscosity slows diffusion of solute toward the growing faces and lets crystals settle to the bottom — the notes list 'the solution is viscous' as a cause of long equilibration times." },
+      { type: "numeric", prompt: "Within the ΔL-law domain, ΔL = G·Δt. With growth rate G = 4 µm/min and residence time Δt = 50 min, compute the size increment ΔL.",
+        answer: 200, tolerance: 2, units: "µm",
+        explain: "ΔL = G·Δt = 4 × 50 = 200 µm — comfortably inside the typical 50–500 µm range. Longer residence time (or higher G) gives larger crystals, uniformly." }
     ]
   },
   {
-    id: "L97", date: "WK20", name: "CPPOM2 · Cyclones & Cake Filtration", questions: [
-      { type: "mcq", prompt: "Compared with a gravity settling (abatement) chamber, a CYCLONE:",
-        options: ["uses centrifugal force → catches FINER particles in LESS space (at higher ΔP)", "uses gravity → only coarse particles", "needs more floor space", "has essentially zero pressure drop"],
-        correct: 0, explain: "Centrifugal force ≫ gravity, so a compact vertical cyclone separates much finer particles than a bulky settling chamber — the price is a higher pressure drop." },
-      { type: "mcq", prompt: "A cyclone separates particles by ___, whereas an electrostatic precipitator (ESP) uses ___:",
-        options: ["centrifugal force ; charged collecting plates (electrostatic)", "electrostatic charge ; centrifugal force", "gravity ; centrifugal force", "filtration ; gravity"],
-        correct: 0, explain: "Cyclone = inertial/centrifugal separation; ESP = charge the particles and collect them on oppositely-charged plates (great for very fine dust/fumes)." },
-      { type: "mcq", prompt: "Cake filtration follows Hagen–Poiseuille: Q = dV/dt = ΔP·A / (32µ·L/D²). In it, ΔP is the ___ and the remaining terms are ___:",
-        options: ["driving force ; resistances", "resistance ; driving forces", "area ; velocities", "viscosity ; densities"],
-        correct: 0, explain: "ΔP pushes the filtrate through; viscosity µ, cake length L and pore geometry D form the resistance. It is the flow-through-porous-media analogue of Ohm's law." },
-      { type: "mcq", prompt: "As filtration proceeds the cake grows (Darcy: L = L₀ + K·V), so the instantaneous rate dV/dt:",
-        options: ["DECREASES with time (more cake ⇒ more resistance)", "increases with time", "stays constant", "becomes negative"],
-        correct: 0, explain: "Every litre filtered adds cake, raising L and the resistance, so at constant ΔP the rate falls. That is why a filtration is timed/optimised against a wash + discharge cycle." },
-      { type: "mcq", prompt: "Integrating V·dV = K'·dt (constant-pressure cake filtration) gives the filtration time:",
-        options: ["t_F = V_F² / (2K')", "t_F = 2K' / V_F", "t_F = V_F / (2K')", "t_F = K'·V_F²"],
-        correct: 0, explain: "∫V dV = K'∫dt ⇒ V_F²/2 = K'·t_F ⇒ t_F = V_F²/(2K') — the parabolic (Ruth) law: filtered volume grows with √t." }
+    id: "L97", date: "WK20", name: "CPPOM2 · Filtration", questions: [
+      { type: "mcq", prompt: "Which characteristic is essential when selecting a filter MEDIUM (septum)? (a transparency, b chemical compatibility, c density)",
+        options: ["b — chemical compatibility with the process fluid", "a — optical transparency", "c — high medium density", "none — cost is the only criterion"],
+        correct: 0, explain: "The septum is in continuous contact with the fluid, so it must resist chemical attack/corrosion. Transparency is irrelevant and the medium density is not an essential selection criterion." },
+      { type: "mcq", prompt: "Why does filtration often work BETTER when the unit is partially dirty?",
+        options: ["The deposited cake itself becomes the filtering medium — it narrows the channels and traps finer particles", "The dirt lubricates the flow and raises the rate", "Dirt lowers the fluid viscosity", "It removes the need for a septum"],
+        correct: 0, explain: "The notes call it 'the paradox: filters work better when (partially) dirty.' The retained solids improve retention/clarity — modelled by the growing cake thickness ΔL = K·V in the Darcy relation." },
+      { type: "mcq", prompt: "The Hagen–Poiseuille filtration law Q = dV/dt = ΔP·A / (32µL/D²) expresses flow as:",
+        options: ["Flow = driving force (ΔP) ÷ resistance (µ, cake length L, channel D)", "Flow = resistance ÷ driving force", "Flow ∝ viscosity × length", "Flow independent of ΔP"],
+        correct: 0, explain: "It is the porous-media analogue of Ohm's law: ΔP is the driving force; viscosity, the growing cake length L = L₀+ΔL(t) and the channel geometry form the resistance. ΔP can be made by pressure, centrifugal force or vacuum." },
+      { type: "mcq", prompt: "Integrating the cake-filtration ODE (V dV = K dt) gives the filtration time:",
+        options: ["t_F = V_F² / (2K)", "t_F = V_F / (2K)", "t_F = 2K / V_F", "t_F = K · V_F²"],
+        correct: 0, explain: "∫V dV = K∫dt ⇒ V_F²/2 = K·t_F ⇒ t_F = V_F²/(2K). The filtration time grows with the SQUARE of the filtrate volume and inversely with K (which embeds ΔP, µ, A and the solids load)." },
+      { type: "mcq", prompt: "Does the applied pressure directly affect the filtration RATE?",
+        options: ["Yes — the rate is directly proportional to ΔP (the driving force), for an incompressible cake", "No — the rate is independent of ΔP", "Yes — the rate is proportional to 1/ΔP", "Only viscosity affects the rate"],
+        correct: 0, explain: "Q = dV/dt = ΔP/R: the flow rate is directly proportional to the applied pressure difference. Viscosity and cake resistance act in the denominator." }
     ]
   },
   {
-    id: "L98", date: "WK21", name: "CPPOM2 · Drying, Lyo & Operation Mgmt", questions: [
-      { type: "mcq", prompt: "On the drying-rate curve, the CONSTANT-rate period is where:",
-        options: ["free surface moisture evaporates at the maximum rate; the surface stays at the wet-bulb T", "the rate climbs steadily from zero", "moisture is already below the critical value", "the solid is fully dry"],
-        correct: 0, explain: "While a wet film covers the surface, evaporation is gas-side controlled → constant rate, surface pinned at the wet-bulb temperature. Free (unbound) moisture leaves first." },
-      { type: "mcq", prompt: "When the moisture falls to the CRITICAL moisture content (CMC):",
-        options: ["the falling-rate period begins — the rate drops as the internal driving force shrinks", "the constant-rate period begins", "the drying rate becomes maximal", "the solid is at its wettest"],
-        correct: 0, explain: "Past the CMC the surface dries out and moisture must diffuse from inside → the rate falls toward zero. The CMC is the knee of the drying-rate curve." },
-      { type: "mcq", prompt: "In a co-current spray dryer where particles meet the HOTTEST gas at the END of their fall (the gas inlet):",
-        options: ["thermolabile materials can burn there → not ideal for very heat-sensitive products", "it is ideal for heat-sensitive products", "particles never finish drying", "the gas must enter cold"],
-        correct: 0, explain: "The driest particles hit the hottest zone last — fine for robust powders, risky for thermolabile actives (which go to lyophilization instead). Watch for decantation/wall deposits too." },
-      { type: "mcq", prompt: "The correct lyophilization (freeze-drying) sequence is:",
-        options: ["lower T first, then lower P below the triple point (sublimation), then slightly raise T to promote desorption", "raise the pressure, then raise the temperature", "lower P first, then boil the solvent off", "freeze and boil the solvent at the same time"],
-        correct: 0, explain: "Freeze → pull vacuum below the triple point so ice SUBLIMES (primary drying) → gentle warming to desorb bound water (secondary drying). Components: chamber, condenser/desublimiser, vacuum, defrosting, thermal integration." },
-      { type: "error", prompt: "One statement about process-operation management is FALSE.",
-        statements: [
-          "Data reconciliation adjusts measured data so that the mass/energy balances close",
-          "Reconciliation needs redundancy (R) in the measurements to be trustworthy",
-          "All gross errors are outliers, but not all outliers are gross errors",
-          "Every outlier in the data is necessarily a gross error"
-        ], wrongIndex: 3, explain: "Manenti's exam point: a gross error IS an outlier, but an outlier may just be process noise. Reconciliation that lands far from the measurement HINTS at a gross error — it doesn't prove every outlier is one." }
+    id: "L98", date: "WK21", name: "CPPOM2 · Drying, Lyophilization & PrOM", questions: [
+      { type: "mcq", prompt: "The three-operation sequence of lyophilization (freeze-drying) is:",
+        options: ["Freezing → primary drying (sublimation, below the triple point, under vacuum) → secondary drying (desorption)", "Boiling → condensation → filtration", "Heating → pressurizing → cooling", "Drying → freezing → melting"],
+        correct: 0, explain: "(1) Freeze the product (small ice crystals); (2) primary drying removes the ice by sublimation below the triple point under vacuum; (3) secondary drying desorbs the residual adsorbed water. A final T/P reset closes the cycle." },
+      { type: "mcq", prompt: "Why are VACUUM PUMPS required in lyophilization?",
+        options: ["To keep the operating point below the triple point (so ice sublimes) and remove the vapour + incondensable gases", "To pressurize the chamber above the triple point", "To inject hot drying air", "To mechanically squeeze water out"],
+        correct: 0, explain: "Sublimation needs pressures below the triple point (4.58 mmHg). The pumps remove the large vapour load from sublimation plus incondensables (in-leakage), keeping the front pressure below the ice vapour pressure so sublimation continues." },
+      { type: "mcq", prompt: "Why is a spray dryer a good choice for HEAT-SENSITIVE material?",
+        options: ["Very short hot-zone residence time + drying at the wet-bulb T (the evaporating water film keeps the solid cool)", "It dries directly at the hot-gas temperature", "It uses no hot gas at all", "It freezes the product first"],
+        correct: 0, explain: "While liquid remains, the evaporating film holds the surface at the wet-bulb temperature, never the hot-gas temperature; combined with a very short residence time, the thermolabile material is not overheated." },
+      { type: "mcq", prompt: "Is a gross error ALWAYS an outlier?",
+        options: ["No — a gross error can be a systematic bias (consistently present), not just a single anomalous reading", "Yes — every gross error is a single outlier", "Yes — and every outlier is therefore a gross error", "No — gross errors can never be detected"],
+        correct: 0, explain: "An outlier is one anomalous reading, but a gross error may be a steady bias (e.g. the notes' Meter B: bias −10.2 with small std) — biased yet not an outlier. So 'gross error' and 'outlier' are not the same." },
+      { type: "mcq", prompt: "How is the Degree of Redundancy (DoR) for data reconciliation estimated?",
+        options: ["DoR = (measurements) + (balances) − (reconciled variables); must be > 0 to reconcile", "DoR = measurements − balances", "DoR = reconciled variables − measurements", "DoR = balances × measurements"],
+        correct: 0, explain: "DoR < 0 → unsolvable (too many unknowns); DoR = 0 → coaptation/inference; DoR > 0 → reconciliation possible. Positive DoR is necessary but not sufficient — the measurements must also be well positioned." }
     ]
   }
 ];
@@ -876,15 +868,15 @@ const BOSS_EXCLUSIVE = [
   { type: 'mcq', prompt: 'Manenti positions CP2 within the chemical engineering curriculum. The course covers BOTH:',
     options: ['Just unit ops', 'UNIT OPERATIONS (HE, pinch, dryers, etc.) AND Process Operations Management (DCS, digital twins, supply chain, sustainability) — bridging plant engineering with operations management', 'Just business', 'Just safety'],
     correct: 1, explain: 'The structure is intentional: traditional unit ops grounded in the modern PrOM context (digital twin, supply chain, CO2 utilization, biorefineries). Bridges Y2 ChemE with the industry\'s digital + sustainability transition.' },
-  { type: "numeric", prompt: "BOSS (CPPOM2): a heat pump delivers Q₂ = 400 kW to the hot side using W = 100 kW of work. Compute its COP = Q₂/W.",
-    answer: 4, tolerance: 0.05, units: "(dimensionless)",
-    explain: "COP = Q₂/W = 400/100 = 4 — four units of heat per unit of work, vs 1 for a resistance heater. That ~4× is the heat-pump electricity saving." },
-  { type: "mcq", prompt: "BOSS (CPPOM2): which device uses CENTRIFUGAL force to capture FINE particles in a small footprint (higher ΔP)?",
-    options: ["Cyclone", "Gravity settling chamber", "Tray dryer", "Lyophiliser"],
-    correct: 0, explain: "The cyclone — centrifugal separation in a compact vertical unit, far finer cut than a gravity settling chamber, at the cost of pressure drop." },
-  { type: "mcq", prompt: "BOSS (CPPOM2): 'All gross errors are outliers, but not all outliers are gross errors.' This means:",
-    options: ["an outlier may just be process noise, so you confirm it before flagging a gross error", "every outlier must be deleted immediately", "gross errors are never outliers", "outliers and gross errors are exactly the same thing"],
-    correct: 0, explain: "Reconcile first; if the reconciled value sits far from the measurement and the point isn't part of a normal scatter cluster, THEN treat it as a gross error. Outlier ≠ automatically a gross error." }
+  { type: "mcq", prompt: "BOSS (CPPOM2): the optimization solved by a Model Predictive Controller (MPC) at each step is:",
+    options: ["A constrained quadratic problem (track setpoint + keep MV near target + suppress moves), of which only the FIRST move is applied (receding horizon)", "A single unconstrained algebraic equation", "An open-loop schedule fixed for the whole horizon", "A PID auto-tuning rule"],
+    correct: 0, explain: "MPC minimises a weighted quadratic objective over a prediction horizon subject to the dynamic model and the u/Δu/y constraints, then applies only the first move and shifts the horizon forward (receding-horizon)." },
+  { type: "mcq", prompt: "BOSS (CPPOM2): in an EYESIM operator-training system, the role of Dynsim is to:",
+    options: ["Provide the dynamic digital twin (the transient first-principles model) that drives the simulated plant", "Render the 3D graphics only", "Store historical data", "Replace the real DCS controllers"],
+    correct: 0, explain: "Dynsim is the dynamic process simulator: its time-dependent model reproduces real transient behaviour (start-up/shutdown, disturbances), which is what the trainees interact with inside the immersive environment." },
+  { type: "mcq", prompt: "BOSS (CPPOM2): in the data-reconciliation objective min Σ ωᵢ(mᵢ − xᵢ)², the weight ωᵢ is usually:",
+    options: ["ωᵢ = 1/σᵢ² — the inverse measurement variance (precise meters trusted more, corrected less)", "ωᵢ = σᵢ² (noisy meters trusted more)", "ωᵢ = 1 for every meter", "ωᵢ always between 0 and 1"],
+    correct: 0, explain: "Weighting by 1/σᵢ² makes accurate instruments (small σ) dominate — their reconciled value stays near the measurement — while noisy meters get corrected more. The weight is any positive number, not limited to [0,1]." }
 ];
 
 // ============================================================
